@@ -1,0 +1,25 @@
+// BlogGrid.scss
+// Grid layout for blog article cards
+
+.blog-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 2rem;
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+}
+
+// Responsive Design
+@media (max-width: 868px) {
+  .blog-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .blog-grid {
+    gap: 1.25rem;
+    margin-top: 1.5rem;
+  }
+}

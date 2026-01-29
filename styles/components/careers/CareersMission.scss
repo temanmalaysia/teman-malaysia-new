@@ -1,0 +1,57 @@
+// ==============================================
+// CAREERS MISSION SECTION STYLES
+// ==============================================
+
+.careers-mission {
+  background: #f9fafb; // gray-50
+  padding: 3rem 0;
+
+  // Content wrapper
+  &__content {
+    max-width: 900px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  // Mission text paragraphs
+  &__text {
+    font-size: 1.125rem;
+    color: #374151; // gray-700
+    line-height: 1.7;
+    margin-bottom: 1.5rem;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  // Highlighted text (if needed)
+  &__highlight {
+    color: #4dd0e1; // primary-color
+    font-weight: 600;
+  }
+}
+
+// ==============================================
+// RESPONSIVE DESIGN
+// ==============================================
+
+@media (max-width: 768px) {
+  .careers-mission {
+    padding: 2.5rem 0;
+
+    &__text {
+      font-size: 1rem;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .careers-mission {
+    padding: 2rem 0;
+
+    &__content {
+      padding: 0 0.5rem;
+    }
+  }
+}

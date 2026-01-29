@@ -1,0 +1,161 @@
+@use '../../variables' as *;
+@use '../../mixins' as *;
+
+.footer {
+  font-size: 0.85rem;
+  background: $gray-900;
+  padding: 4rem 0 2rem;
+}
+
+.footer__grid {
+  display: grid;
+  gap: $spacing-2xl;
+  align-items: start;
+  grid-template-columns: 1fr;
+  text-align: center;
+
+  @include md {
+    grid-template-columns: auto 1fr 1fr;
+    text-align: left;
+  }
+}
+
+.footer__brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0;
+
+  @media (max-width: 767px) {
+    order: 1;
+    margin-bottom: $spacing-2xl;
+  }
+}
+
+.footer__logo {
+  max-width: 150px;
+  height: auto;
+}
+
+.footer__office {
+  @media (max-width: 767px) {
+    order: 2;
+    margin-bottom: $spacing-2xl;
+  }
+}
+
+.footer__social {
+  @media (max-width: 767px) {
+    order: 3;
+  }
+}
+
+.footer__title {
+  font-size: 1rem;
+  color: $text-white;
+}
+
+.footer__divider {
+  width: 10%;
+  height: 2px;
+  background-color: $primary-color;
+  margin: $spacing-sm 0 $spacing-md;
+}
+
+.footer__social-text {
+  font-size: 0.8rem;
+  color: $gray-400;
+}
+
+.contact-info {
+  text-align: center;
+
+  @include md {
+    text-align: left;
+  }
+}
+
+.contact-item {
+  display: flex;
+  align-items: flex-start;
+  gap: $spacing-sm;
+  margin-bottom: $spacing-sm;
+
+  svg {
+    flex-shrink: 0;
+    color: $primary-color;
+  }
+
+  span {
+    font-size: 0.8rem;
+    color: $gray-400;
+  }
+}
+
+.social-links {
+  display: flex;
+  gap: $spacing-md;
+  justify-content: center;
+
+  @include md {
+    justify-content: flex-start;
+  }
+}
+
+.social-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: $radius-full;
+  background: $bg-dark;
+  color: $gray-300;
+  transition: $transition-fast;
+
+  &:hover {
+    background-color: $primary-color;
+    color: $text-white;
+  }
+}
+
+.footer__bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $spacing-md;
+  border-top: 1px solid $gray-200;
+  padding-top: $spacing-md;
+  margin-top: $spacing-2xl;
+
+  @media (max-width: 767px) {
+    flex-direction: column;
+    text-align: center;
+  }
+}
+
+.footer__copyright p {
+  font-size: 0.75rem;
+  color: $gray-400;
+}
+
+.footer__legal .legal__list {
+  display: flex;
+  gap: $spacing-md;
+}
+
+.legal__list a {
+  font-size: 0.75rem;
+  color: $gray-400;
+  &:hover {
+    color: $primary-color;
+  }
+}
+
+.whatsapp-title {
+  font-size: 0.8rem;
+}
+
+.whatsapp-subtitle {
+  font-size: 0.7rem;
+}

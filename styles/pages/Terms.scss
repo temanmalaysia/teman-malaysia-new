@@ -1,0 +1,185 @@
+// Terms of Use Page Styles
+// ========================
+
+// Variables
+$terms-text-color: #374151;
+$terms-heading-color: #1f2937;
+$terms-subheading-color: #374151;
+$terms-muted-color: #6b7280;
+$terms-border-color: #e5e7eb;
+$terms-accent-color: #3b82f6;
+$terms-bg-light: #f9fafb;
+$terms-warning-bg: #fffbeb;
+$terms-warning-border: #fcd34d;
+$terms-warning-text: #92400e;
+
+// Main Section
+.terms-section {
+  padding: 120px 0 60px 0;
+  min-height: 100vh;
+  background: #ffffff;
+
+  @media (max-width: 768px) {
+    padding: 100px 0 40px 0;
+  }
+
+  .container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 20px;
+
+    @media (max-width: 768px) {
+      padding: 0 15px;
+    }
+  }
+}
+
+// Terms Header
+.terms-header {
+  text-align: center;
+  margin-bottom: 40px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid $terms-border-color;
+
+  &__title {
+    font-size: 2rem;
+    font-weight: 600;
+    color: $terms-heading-color;
+    margin-bottom: 8px;
+
+    @media (max-width: 768px) {
+      font-size: 1.5rem;
+    }
+  }
+
+  &__date {
+    font-size: 14px;
+    color: $terms-muted-color;
+    margin-top: 8px;
+  }
+}
+
+// Terms Content
+.terms-content {
+  max-width: 100%;
+  margin: 2rem auto;
+
+  a {
+    color: $terms-accent-color;
+    text-decoration: none;
+    
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: $terms-heading-color;
+    margin: 40px 0 20px 0;
+    padding-bottom: 10px;
+    border-bottom: 1px solid $terms-border-color;
+  }
+
+  h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: $gray-700;
+    margin: 25px 0 15px 0;
+  }
+
+  p {
+    margin-bottom: 15px;
+    line-height: 1.6;
+    text-align: justify;
+  }
+
+  ul {
+    margin: 15px 0 15px 25px;
+    list-style-type: disc;
+
+    @media (max-width: 768px) {
+      margin-left: 20px;
+    }
+  }
+
+  li {
+    margin-bottom: 6px;
+    line-height: 1.5;
+  }
+
+  ol {
+    margin: 15px 0 15px 25px;
+    list-style-type: decimal;
+
+    @media (max-width: 768px) {
+      margin-left: 20px;
+    }
+
+    li {
+      margin-bottom: 8px;
+      padding-left: 5px;
+    }
+  }
+}
+
+// Section Number
+.section-number {
+  color: $terms-accent-color;
+  font-weight: 600;
+}
+
+// Terms Article
+.terms-article {
+  margin-bottom: 20px;
+}
+
+// Terms Subsection
+.terms-subsection {
+  margin-bottom: 15px;
+}
+
+// Notice Boxes
+.important-notice {
+  background: $terms-warning-bg;
+  border: 1px solid $terms-border-color;
+  border-left: 4px solid $terms-warning-text;
+  padding: 20px;
+  margin-bottom: 30px;
+  border-radius: 4px;
+
+  strong {
+    color: $terms-warning-text;
+  }
+
+  p {
+    margin-bottom: 0;
+  }
+}
+
+.company-info {
+  background: $terms-bg-light;
+  border: 1px solid $terms-border-color;
+  padding: 20px;
+  margin-bottom: 30px;
+  border-radius: 4px;
+
+  p {
+    margin-bottom: 0;
+  }
+}
+
+// Signature
+.terms-signature {
+  text-align: start;
+  margin-top: 40px;
+  padding-top: 20px;
+  border-top: 1px solid $terms-border-color;
+  font-weight: 500;
+  color: $terms-subheading-color;
+
+  p {
+    margin-bottom: 5px;
+  }
+}

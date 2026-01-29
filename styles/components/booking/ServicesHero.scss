@@ -1,0 +1,87 @@
+// ===========================================
+// SERVICES HERO SECTION
+// ===========================================
+
+.services-hero {
+  padding: 30px 0 $spacing-xl 0;
+  background: $gray-50;
+
+  &__header {
+    text-align: center;
+    margin-bottom: $spacing-4xl;
+  }
+
+  &__title {
+    font-size: $font-size-5xl;
+    font-weight: $font-weight-bold;
+    color: $gray-900;
+    margin-bottom: $spacing-md;
+  }
+
+  &__subtitle {
+    font-size: $font-size-xl;
+    color: $gray-500;
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+}
+
+// ===========================================
+// RESPONSIVE - Tablet (max-width: 1024px)
+// ===========================================
+
+@media (max-width: $breakpoint-lg) {
+  .services-hero {
+    padding: 30px 0 $spacing-lg 0;
+
+    &__title {
+      font-size: $font-size-4xl;
+    }
+
+    &__subtitle {
+      font-size: $font-size-lg;
+    }
+  }
+}
+
+// ===========================================
+// RESPONSIVE - Mobile (max-width: 768px)
+// ===========================================
+
+@media (max-width: $breakpoint-md) {
+  .services-hero {
+    padding: 30px 0 $spacing-md 0;
+
+    &__header {
+      margin-bottom: $spacing-2xl;
+    }
+
+    &__title {
+      font-size: $font-size-3xl;
+    }
+
+    &__subtitle {
+      font-size: $font-size-base;
+      padding: 0 $spacing-md;
+    }
+  }
+}
+
+// ===========================================
+// RESPONSIVE - Small Mobile (max-width: 480px)
+// ===========================================
+
+@media (max-width: 480px) {
+  .services-hero {
+    padding: 30px 0 $spacing-sm 0;
+
+    &__title {
+      font-size: $font-size-2xl;
+    }
+
+    &__subtitle {
+      font-size: $font-size-sm;
+    }
+  }
+}

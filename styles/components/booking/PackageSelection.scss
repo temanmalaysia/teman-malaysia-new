@@ -1,0 +1,450 @@
+// ===========================================
+// UNIFIED PACKAGE SELECTION COMPONENT
+// ===========================================
+
+.package-selection {
+  // CSS Custom Properties (defaults to health/blue theme)
+  --package-active-color: #3b82f6;
+  --package-active-bg: #eff6ff;
+  --package-active-shadow: rgba(59, 130, 246, 0.1);
+  --package-addon-color: #8b5cf6;
+  --package-addon-bg: #f5f3ff;
+  --package-info-color: #6b7280;
+  --package-info-bg: #f9fafb;
+
+  padding: $spacing-2xl;
+
+  // Section Title
+  &__title {
+    font-size: $font-size-2xl;
+    font-weight: $font-weight-semibold;
+    color: $gray-900;
+    margin-bottom: $spacing-xl;
+    text-align: center;
+  }
+
+  // Package Options Container
+  &__options {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-md;
+    margin-bottom: $spacing-xl;
+  }
+
+  // Package Card
+  &__card {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    gap: $spacing-md;
+    padding: $spacing-lg;
+    background: $bg-primary;
+    border: 2px solid $gray-200;
+    border-radius: $radius-xl;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      border-color: $gray-300;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    &.selected {
+      border-color: var(--package-active-color);
+      background: var(--package-active-bg);
+      box-shadow: 0 0 0 4px var(--package-active-shadow);
+    }
+
+    // Hide default radio/checkbox
+    input[type="radio"],
+    input[type="checkbox"] {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+  }
+
+  // Card Content
+  &__card-content {
+    flex: 1;
+  }
+
+  &__card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: $spacing-sm;
+    gap: $spacing-md;
+  }
+
+  &__card-title {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-semibold;
+    color: $gray-900;
+  }
+
+  &__card-price {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-bold;
+    color: var(--package-active-color);
+    text-align: right;
+    white-space: nowrap;
+
+    small {
+      display: block;
+      font-size: $font-size-xs;
+      font-weight: $font-weight-normal;
+      color: $gray-500;
+    }
+  }
+
+  &__card-description {
+    font-size: $font-size-sm;
+    color: $gray-600;
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  // Package Includes (for home packages)
+  &__includes {
+    margin-top: $spacing-md;
+    padding: $spacing-md;
+    background: $gray-50;
+    border-radius: $radius-lg;
+  }
+
+  &__includes-title {
+    display: block;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-semibold;
+    color: var(--package-active-color);
+    margin-bottom: $spacing-sm;
+  }
+
+  &__includes-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $spacing-md $spacing-xl;
+  }
+
+  &__includes-item {
+    display: flex;
+    align-items: center;
+    gap: $spacing-xs;
+    font-size: $font-size-sm;
+    color: $gray-700;
+
+    svg {
+      color: $gray-400;
+      flex-shrink: 0;
+    }
+  }
+
+  // Hours Selection
+  &__hours {
+    margin-top: $spacing-md;
+    padding-top: $spacing-md;
+    border-top: 1px solid $gray-200;
+  }
+
+  &__hours-label {
+    display: block;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-medium;
+    color: $gray-700;
+    margin-bottom: $spacing-sm;
+  }
+
+  &__hours-select {
+    width: 100%;
+    max-width: 200px;
+    padding: $spacing-sm $spacing-md;
+    font-size: $font-size-base;
+    border: 2px solid $gray-200;
+    border-radius: $radius-lg;
+    background: $bg-primary;
+    color: $gray-900;
+    cursor: pointer;
+    transition: border-color 0.2s ease;
+
+    &:focus {
+      outline: none;
+      border-color: var(--package-active-color);
+    }
+  }
+
+  // Add-on Section
+  &__addon {
+    background: var(--package-addon-bg);
+    border: 2px dashed var(--package-addon-color);
+    border-radius: $radius-xl;
+    padding: $spacing-lg;
+    margin-bottom: $spacing-xl;
+  }
+
+  &__addon-title {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+    color: var(--package-addon-color);
+    margin-bottom: $spacing-md;
+    font-size: $font-size-base;
+    font-weight: $font-weight-semibold;
+
+    svg {
+      flex-shrink: 0;
+    }
+  }
+
+  &__addon-notes {
+    margin-top: $spacing-md;
+    padding: $spacing-sm $spacing-md;
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: $radius-md;
+
+    small {
+      display: block;
+      color: $gray-600;
+      font-size: $font-size-xs;
+      margin-bottom: 4px;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+
+  // Additional Info Box
+  &__info {
+    background: #fef3c7;
+    border: 1px solid #fcd34d;
+    padding: $spacing-lg;
+    border-radius: $radius-lg;
+    margin-bottom: $spacing-xl;
+  }
+
+  &__info-title {
+    color: #92400e;
+    margin-bottom: $spacing-sm;
+    font-size: $font-size-base;
+    font-weight: $font-weight-semibold;
+  }
+
+  &__info small {
+    display: block;
+    color: #b45309;
+    font-size: $font-size-sm;
+    margin-bottom: $spacing-sm;
+    line-height: 1.5;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  // Actions
+  &__actions {
+    display: flex;
+    justify-content: flex-start;
+    padding-top: $spacing-lg;
+    border-top: 1px solid $gray-100;
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: $spacing-sm;
+      padding: $spacing-md $spacing-xl;
+      font-size: $font-size-base;
+      font-weight: $font-weight-semibold;
+      border-radius: $radius-lg;
+      transition: all 0.2s ease;
+    }
+
+    .btn--primary {
+      background: var(--package-active-color);
+      color: $text-white;
+      border: none;
+
+      &:hover {
+        opacity: 0.9;
+        transform: translateY(-1px);
+      }
+    }
+
+    .btn--large {
+      padding: $spacing-md $spacing-2xl;
+    }
+  }
+}
+
+// ===========================================
+// THEME VARIANTS
+// ===========================================
+
+// Health Appointments - Blue theme (default)
+.package-selection--health {
+  --package-active-color: #3b82f6;
+  --package-active-bg: #eff6ff;
+  --package-active-shadow: rgba(59, 130, 246, 0.1);
+
+  // Amber info box
+  .package-selection__info {
+    background: #fef3c7;
+    border-color: #fcd34d;
+  }
+  .package-selection__info-title {
+    color: #92400e;
+  }
+  .package-selection__info small {
+    color: #b45309;
+  }
+}
+
+// Dialysis - Red theme
+.package-selection--dialysis {
+  --package-active-color: #ef4444;
+  --package-active-bg: #fef2f2;
+  --package-active-shadow: rgba(239, 68, 68, 0.1);
+  --package-addon-color: #8b5cf6;
+  --package-addon-bg: #f5f3ff;
+
+  // Red/pink info box
+  .package-selection__info {
+    background: #fef2f2;
+    border-color: #fecaca;
+  }
+  .package-selection__info-title {
+    color: #dc2626;
+  }
+  .package-selection__info small {
+    color: #ef4444;
+  }
+}
+
+// Custom Activities - Amber/Orange theme
+.package-selection--customActivities {
+  --package-active-color: #f59e0b;
+  --package-active-bg: #fffbeb;
+  --package-active-shadow: rgba(245, 158, 11, 0.1);
+
+  // Amber info box
+  .package-selection__info {
+    background: #fef3c7;
+    border-color: #fcd34d;
+  }
+  .package-selection__info-title {
+    color: #92400e;
+  }
+  .package-selection__info small {
+    color: #b45309;
+  }
+}
+
+// Home Package - Green theme
+.package-selection--homePackage {
+  --package-active-color: #059669;
+  --package-active-bg: #ecfdf5;
+  --package-active-shadow: rgba(5, 150, 105, 0.1);
+
+  // Green info box
+  .package-selection__info {
+    background: #ecfdf5;
+    border-color: #a7f3d0;
+  }
+  .package-selection__info-title {
+    color: #047857;
+  }
+  .package-selection__info small {
+    color: #059669;
+  }
+}
+
+// ===========================================
+// RESPONSIVE - Tablet (max-width: 1024px)
+// ===========================================
+
+@media (max-width: $breakpoint-lg) {
+  .package-selection {
+    padding: $spacing-xl;
+  }
+}
+
+// ===========================================
+// RESPONSIVE - Mobile (max-width: 768px)
+// ===========================================
+
+@media (max-width: $breakpoint-md) {
+  .package-selection {
+    padding: $spacing-lg;
+
+    &__title {
+      font-size: $font-size-xl;
+      margin-bottom: $spacing-lg;
+    }
+
+    &__card {
+      padding: $spacing-md;
+      flex-direction: row;
+    }
+
+    &__card-header {
+      flex-direction: column;
+      gap: $spacing-xs;
+    }
+
+    &__card-title {
+      font-size: $font-size-base;
+    }
+
+    &__card-price {
+      font-size: $font-size-base;
+      text-align: left;
+    }
+
+    &__card-description {
+      font-size: $font-size-xs;
+    }
+
+    &__radio-indicator,
+    &__checkbox-indicator {
+      width: 20px;
+      height: 20px;
+    }
+
+    &__radio-indicator::after {
+      width: 10px;
+      height: 10px;
+    }
+
+    &__actions {
+      justify-content: center;
+
+      .btn {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+  }
+}
+
+// ===========================================
+// RESPONSIVE - Small Mobile (max-width: 480px)
+// ===========================================
+
+@media (max-width: 480px) {
+  .package-selection {
+    padding: $spacing-md;
+
+    &__title {
+      font-size: $font-size-lg;
+    }
+
+    &__card {
+      padding: $spacing-sm $spacing-md;
+    }
+
+    &__addon {
+      padding: $spacing-md;
+    }
+  }
+}

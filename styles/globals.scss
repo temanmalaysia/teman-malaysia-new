@@ -1,0 +1,262 @@
+// ===========================================
+// GLOBAL STYLES
+// ===========================================
+
+@use "./variables" as *;
+@use "./mixins" as *;
+
+// Component styles - use @forward or @import instead
+// shared components
+@import "./components/shared/Header.scss";
+@import "./components/shared/Footer.scss";
+@import "./components/shared/MultiDatePicker.scss";
+@import "./components/shared/GlobalLoader.scss";
+
+// modal components
+@import "./components/modal/SuccessModal.scss";
+@import "./components/modal/AuthModal.scss";
+
+// main components
+@import "./components/main/Hero.scss";
+@import "./components/main/About.scss";
+@import "./components/main/Promise.scss";
+@import "./components/main/News.scss";
+@import "./components/main/Testimony.scss";
+
+// about-section components
+@import "./components/aboutSection/AboutVideo.scss";
+@import "./components/aboutSection/AboutSection.scss";
+@import "./components/aboutSection/VisionMission.scss";
+@import "./components/aboutSection/Memories.scss";
+@import "./components/aboutSection/Stats.scss";
+
+// booking components
+@import "./components/booking/ServicesHero.scss";
+@import "./components/booking/ServicesGrid.scss";
+@import "./components/booking/QuickContact.scss";
+@import "./components/booking/WhyChooseUs.scss";
+@import "./components/booking/BookingHero.scss";
+@import "./components/booking/BookingFormContainer.scss";
+@import "./components/booking/ProgressSteps.scss";
+@import "./components/booking/PackageSelection.scss";
+@import "./components/booking/BookingDetails.scss";
+@import "./components/booking/BookingSummary.scss";
+@import "./components/booking/CareRecipientSelector.scss";
+
+// blog components
+@import "./components/blog/BlogHero.scss";
+@import "./components/blog/StatsHighlight.scss";
+@import "./components/blog/BlogGrid.scss";
+@import "./components/blog/BlogCard.scss";
+
+// contact components
+@import "./components/contact/ContactHero.scss";
+@import "./components/contact/TemanionApplication.scss";
+@import "./components/contact/ContactForm.scss";
+
+// Careers components
+@import "./components/careers/CareersHero.scss";
+@import "./components/careers/CareersMission.scss";
+@import "./components/careers/CareersWhyJoin.scss";
+@import "./components/careers/CareersWhatWeOffer.scss";
+@import "./components/careers/CareersWorkCulture.scss";
+@import "./components/careers/CareersCoreValues.scss";
+@import "./components/careers/CareersReadyToJoin.scss";
+
+
+
+// Pages
+@import "./pages/Home.scss";
+@import "./pages/Terms.scss";
+@import "./pages/Privacy.scss";
+@import "./pages/user.scss";
+
+// Google Fonts
+// Google Fonts
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
+
+// Reset & Base
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: $font-primary;
+  font-size: $font-size-base;
+  font-weight: $font-weight-normal;
+  line-height: 1.6;
+  color: $text-primary;
+  background-color: $bg-primary;
+  overflow-x: hidden;
+}
+
+// Typography
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: $font-display;
+  font-weight: $font-weight-bold;
+  line-height: 1.2;
+  color: $text-primary;
+}
+
+h1 {
+  @include heading-1;
+}
+h2 {
+  @include heading-2;
+}
+h3 {
+  @include heading-3;
+}
+
+p {
+  @include body-text;
+  margin-bottom: $spacing-md;
+}
+
+p:last-child {
+  margin-bottom: 0;
+}
+
+a {
+  color: $primary-color;
+  text-decoration: none;
+  transition: color $transition-fast;
+}
+
+a:hover {
+  color: $primary-dark;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+ul,
+ol {
+  list-style: none;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+input,
+textarea,
+select {
+  font-family: inherit;
+  font-size: inherit;
+}
+
+// Container
+.container {
+  @include container;
+}
+
+// Section
+.section {
+  padding: $spacing-3xl 0;
+
+  @include md {
+    padding: $spacing-4xl 0;
+  }
+}
+
+// Section titles
+.section-label {
+  display: inline-block;
+  font-family: $font-primary;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: $primary-color;
+  margin-bottom: $spacing-md;
+}
+
+.section-title {
+  margin-bottom: $spacing-lg;
+  @include heading-2;
+}
+
+.section-title span {
+  @include text-gradient;
+}
+
+// Buttons
+.btn {
+  @include button-base;
+}
+
+.btn-primary {
+  @include button-primary;
+}
+
+.btn-secondary {
+  @include button-secondary;
+}
+
+.btn-lg {
+  padding: $spacing-lg $spacing-2xl;
+  font-size: $font-size-lg;
+}
+
+.btn-sm {
+  padding: $spacing-sm $spacing-lg;
+  font-size: $font-size-sm;
+}
+
+// Utilities
+.text-center {
+  text-align: center;
+}
+.text-left {
+  text-align: left;
+}
+.text-right {
+  text-align: right;
+}
+
+// Selection
+::selection {
+  background-color: $primary-color;
+  color: $text-white;
+}
+
+// Scrollbar
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: $bg-secondary;
+}
+
+::-webkit-scrollbar-thumb {
+  background: $primary-color;
+  border-radius: $radius-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: $primary-dark;
+}

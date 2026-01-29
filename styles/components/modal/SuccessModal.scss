@@ -1,0 +1,260 @@
+// ===========================================
+// SUCCESS MODAL COMPONENT STYLES
+// ===========================================
+
+.success-modal {
+  // ===========================================
+  // THEME COLORS (Default - Health)
+  // ===========================================
+  --modal-primary-color: #3b82f6;
+  --modal-primary-bg: #f0f9ff;
+  --modal-primary-hover: #2563eb;
+  --modal-success-color: #059669;
+
+  // ===========================================
+  // THEME VARIATIONS
+  // ===========================================
+
+  // Health Appointments - Blue theme
+  &--health {
+    --modal-primary-color: #3b82f6;
+    --modal-primary-bg: #f0f9ff;
+    --modal-primary-hover: #2563eb;
+  }
+
+  // Dialysis Treatment - Red theme
+  &--dialysis {
+    --modal-primary-color: #ef4444;
+    --modal-primary-bg: #fef2f2;
+    --modal-primary-hover: #dc2626;
+  }
+
+  // Custom Activities - Amber/Orange theme
+  &--customActivities {
+    --modal-primary-color: #f59e0b;
+    --modal-primary-bg: #fffbeb;
+    --modal-primary-hover: #d97706;
+  }
+
+  // Home Package - Green theme
+  &--homePackage {
+    --modal-primary-color: #059669;
+    --modal-primary-bg: #f0fdf4;
+    --modal-primary-hover: #047857;
+  }
+
+  // ===========================================
+  // BACKDROP
+  // ===========================================
+  &__backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: $spacing-lg;
+    animation: modalFadeIn 0.3s ease;
+  }
+
+  @keyframes modalFadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  // ===========================================
+  // CONTENT
+  // ===========================================
+  &__content {
+    background: white;
+    border-radius: $radius-2xl;
+    padding: $spacing-2xl;
+    max-width: 500px;
+    width: 100%;
+    text-align: center;
+    animation: modalSlideUp 0.3s ease;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+
+  @keyframes modalSlideUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  // ===========================================
+  // ICON
+  // ===========================================
+  &__icon {
+    margin-bottom: $spacing-lg;
+    color: var(--modal-success-color);
+
+    svg {
+      width: 64px;
+      height: 64px;
+    }
+  }
+
+  // ===========================================
+  // TITLE
+  // ===========================================
+  &__title {
+    font-size: $font-size-2xl;
+    font-weight: $font-weight-bold;
+    color: $gray-900;
+    margin-bottom: $spacing-md;
+  }
+
+  // ===========================================
+  // MESSAGE
+  // ===========================================
+  &__message {
+    font-size: $font-size-sm;
+    color: $gray-600;
+    margin-bottom: $spacing-md;
+    line-height: 1.6;
+  }
+
+  // ===========================================
+  // LINK
+  // ===========================================
+  &__link {
+    color: var(--modal-primary-color);
+    font-weight: $font-weight-semibold;
+    text-decoration: underline;
+    transition: color 0.2s ease;
+
+    &:hover {
+      color: var(--modal-primary-hover);
+      text-decoration: none;
+    }
+  }
+
+  // ===========================================
+  // REFERENCE
+  // ===========================================
+  &__reference {
+    background: $gray-100;
+    padding: $spacing-md $spacing-lg;
+    border-radius: $radius-lg;
+    margin: $spacing-lg 0;
+    font-size: $font-size-base;
+    color: $gray-900;
+  }
+
+  // ===========================================
+  // ACTIONS
+  // ===========================================
+  &__actions {
+    display: flex;
+    gap: $spacing-md;
+    justify-content: center;
+    margin-top: $spacing-lg;
+
+    .btn {
+      flex: 1;
+      max-width: 180px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: $spacing-sm;
+      padding: $spacing-md $spacing-xl;
+      font-size: $font-size-base;
+      font-weight: $font-weight-semibold;
+      border-radius: $radius-lg;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .btn--primary {
+      background: var(--modal-primary-color);
+      border: 2px solid var(--modal-primary-color);
+      color: white;
+
+      &:hover {
+        background: var(--modal-primary-hover);
+        border-color: var(--modal-primary-hover);
+      }
+    }
+
+    .btn--outline {
+      background: transparent;
+      border: 2px solid var(--modal-primary-color);
+      color: var(--modal-primary-color);
+
+      &:hover {
+        background: var(--modal-primary-bg);
+      }
+    }
+  }
+
+  // ===========================================
+  // RESPONSIVE - Tablet
+  // ===========================================
+  @media (max-width: $breakpoint-md) {
+    &__content {
+      padding: $spacing-lg;
+      margin: $spacing-md;
+    }
+
+    &__title {
+      font-size: $font-size-xl;
+    }
+
+    &__actions {
+      flex-direction: column;
+
+      .btn {
+        width: 100%;
+        max-width: none;
+      }
+    }
+  }
+
+  // ===========================================
+  // RESPONSIVE - Small Mobile
+  // ===========================================
+  @media (max-width: 480px) {
+    &__backdrop {
+      padding: $spacing-md;
+    }
+
+    &__content {
+      padding: $spacing-md;
+    }
+
+    &__icon svg {
+      width: 48px;
+      height: 48px;
+    }
+
+    &__title {
+      font-size: $font-size-lg;
+    }
+
+    &__message {
+      font-size: $font-size-xs;
+    }
+
+    &__reference {
+      padding: $spacing-sm $spacing-md;
+      font-size: $font-size-sm;
+    }
+  }
+}

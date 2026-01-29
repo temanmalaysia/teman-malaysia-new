@@ -1,0 +1,218 @@
+// ===========================================
+// MULTI-DATE PICKER COMPONENT
+// ===========================================
+
+.multi-date-picker {
+  --picker-active-color: #ef4444;
+  --picker-active-bg: rgba(239, 68, 68, 0.1);
+  --picker-selected-bg: #ef4444;
+  --picker-selected-hover: #dc2626;
+
+  position: relative;
+  width: 100%;
+
+  // Theme variants
+  &--red {
+    --picker-active-color: #ef4444;
+    --picker-active-bg: rgba(239, 68, 68, 0.1);
+    --picker-selected-bg: #ef4444;
+    --picker-selected-hover: #dc2626;
+  }
+
+  &--amber {
+    --picker-active-color: #f59e0b;
+    --picker-active-bg: rgba(245, 158, 11, 0.1);
+    --picker-selected-bg: #f59e0b;
+    --picker-selected-hover: #d97706;
+  }
+
+  &--green {
+    --picker-active-color: #10b981;
+    --picker-active-bg: rgba(16, 185, 129, 0.1);
+    --picker-selected-bg: #10b981;
+    --picker-selected-hover: #059669;
+  }
+
+  // Input field
+  &__input {
+    position: relative;
+    cursor: pointer;
+
+    input {
+      width: 100%;
+      padding: $spacing-sm $spacing-md;
+      padding-right: 40px;
+      font-size: $font-size-base;
+      font-family: inherit;
+      color: $gray-900;
+      background: $bg-primary;
+      border: 2px solid $gray-200;
+      border-radius: $radius-lg;
+      cursor: pointer;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+      &::placeholder {
+        color: $gray-400;
+      }
+
+      &:focus {
+        outline: none;
+      }
+    }
+
+    &--active input {
+      border-color: var(--picker-active-color);
+      box-shadow: 0 0 0 3px var(--picker-active-bg);
+    }
+  }
+
+  &__icon {
+    position: absolute;
+    right: $spacing-md;
+    top: 50%;
+    transform: translateY(-50%);
+    color: $gray-400;
+    pointer-events: none;
+  }
+
+  // Calendar dropdown
+  &__calendar {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    z-index: 100;
+    background: $bg-primary;
+    border: 1px solid $gray-200;
+    border-radius: $radius-lg;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+    padding: $spacing-md;
+    min-width: 280px;
+  }
+
+  // Calendar header
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: $spacing-md;
+    padding-bottom: $spacing-sm;
+    border-bottom: 1px solid $gray-100;
+  }
+
+  &__nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background: transparent;
+    border: none;
+    border-radius: $radius-md;
+    cursor: pointer;
+    color: $gray-600;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: $gray-100;
+      color: $gray-900;
+    }
+  }
+
+  &__month-year {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+    font-size: $font-size-base;
+    font-weight: $font-weight-semibold;
+    color: $gray-900;
+  }
+
+  // Days header
+  &__days-header {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+    margin-bottom: $spacing-xs;
+  }
+
+  &__day-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 32px;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-medium;
+    color: $gray-500;
+    text-transform: uppercase;
+  }
+
+  // Days grid
+  &__days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+  }
+
+  &__day {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 36px;
+    font-size: $font-size-sm;
+    color: $gray-700;
+    border-radius: $radius-md;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover:not(&--disabled):not(&--selected) {
+      background: $gray-100;
+    }
+
+    &--empty {
+      cursor: default;
+    }
+
+    &--disabled {
+      color: $gray-300;
+      cursor: not-allowed;
+    }
+
+    &--today {
+      font-weight: $font-weight-semibold;
+      color: var(--picker-active-color);
+    }
+
+    &--selected {
+      background: var(--picker-selected-bg);
+      color: white;
+      font-weight: $font-weight-medium;
+
+      &:hover {
+        background: var(--picker-selected-hover);
+      }
+    }
+  }
+}
+
+// ===========================================
+// RESPONSIVE - Mobile (max-width: 768px)
+// ===========================================
+
+@media (max-width: $breakpoint-md) {
+  .multi-date-picker {
+    &__calendar {
+      min-width: 260px;
+      padding: $spacing-sm;
+    }
+
+    &__day {
+      height: 32px;
+      font-size: $font-size-xs;
+    }
+
+    &__day-header {
+      height: 28px;
+      font-size: 10px;
+    }
+  }
+}

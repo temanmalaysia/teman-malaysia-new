@@ -1,0 +1,119 @@
+// ==============================================
+// CAREERS CORE VALUES SECTION STYLES
+// ==============================================
+
+// Variables
+$primary-color: #4dd0e1;
+$gray-50: #f9fafb;
+$gray-700: #374151;
+$gray-900: #111827;
+$white: #ffffff;
+$shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+$shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+$radius-xl: 0.75rem;
+$transition-fast: 150ms ease-in-out;
+
+.careers-core-values {
+  background: $gray-50;
+  padding: 3rem 0;
+
+  // Values Grid
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+  }
+}
+
+// ==============================================
+// VALUE CARD
+// ==============================================
+
+.careers-core-values {
+  .value-card {
+    background: $white;
+    padding: 2rem;
+    border-radius: $radius-xl;
+    box-shadow: $shadow-md;
+    border-left: 4px solid $primary-color;
+    transition: $transition-fast;
+
+    &:hover {
+      transform: translateY(-3px);
+      box-shadow: $shadow-lg;
+    }
+
+    &__title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: $primary-color !important;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+
+      i {
+        font-size: 1.1rem;
+      }
+    }
+
+    &__description {
+      color: $gray-700;
+      line-height: 1.6;
+      margin: 0;
+    }
+  }
+}
+
+// ==============================================
+// RESPONSIVE DESIGN
+// ==============================================
+
+@media (max-width: 1024px) {
+  .careers-core-values {
+    &__grid {
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .careers-core-values {
+    padding: 2.5rem 0;
+
+    &__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .careers-core-values {
+    .value-card {
+      padding: 1.5rem;
+
+      &__title {
+        font-size: 1.15rem;
+      }
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .careers-core-values {
+    padding: 2rem 0;
+  }
+
+  .careers-core-values {
+    .value-card {
+      padding: 1.25rem;
+
+      &__title {
+        font-size: 1.1rem;
+      }
+
+      &__description {
+        font-size: 0.9rem;
+      }
+    }
+  }
+}

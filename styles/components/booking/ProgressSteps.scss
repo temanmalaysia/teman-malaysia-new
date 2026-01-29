@@ -1,0 +1,181 @@
+// ===========================================
+// UNIFIED PROGRESS STEPS COMPONENT
+// ===========================================
+
+.progress-steps {
+  // CSS Custom Properties (defaults to health/blue theme)
+  --progress-active-color: #3b82f6;
+  --progress-active-shadow: rgba(59, 130, 246, 0.1);
+  --progress-completed-color: #10b981;
+
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 0;
+  margin: $spacing-2xl auto $spacing-3xl auto;
+  padding: 0 $spacing-md;
+  max-width: 500px;
+  position: relative;
+
+  // Step Container
+  &__step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: $spacing-sm;
+    position: relative;
+    flex: 1;
+  }
+
+  // Step Number Circle
+  &__number {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: $font-size-lg;
+    font-weight: $font-weight-semibold;
+    background: $bg-primary;
+    color: $gray-400;
+    border: 3px solid $gray-200;
+    transition: all 0.3s ease;
+    position: relative;
+    z-index: 1;
+
+    svg {
+      stroke-width: 3;
+    }
+  }
+
+  // Step Label
+  &__label {
+    font-size: $font-size-sm;
+    color: $gray-400;
+    font-weight: $font-weight-medium;
+    text-align: center;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+  }
+
+  // Active State
+  &__step.active {
+    .progress-steps__number {
+      background: var(--progress-active-color);
+      color: $text-white;
+      border-color: var(--progress-active-color);
+      box-shadow: 0 0 0 4px var(--progress-active-shadow);
+    }
+
+    .progress-steps__label {
+      color: var(--progress-active-color);
+      font-weight: $font-weight-semibold;
+    }
+  }
+
+  // Completed State
+  &__step.completed {
+    .progress-steps__number {
+      background: var(--progress-completed-color);
+      color: $text-white;
+      border-color: var(--progress-completed-color);
+    }
+
+    .progress-steps__label {
+      color: var(--progress-completed-color);
+      font-weight: $font-weight-semibold;
+    }
+  }
+}
+
+// ===========================================
+// THEME VARIANTS
+// ===========================================
+
+// Health Appointments - Blue theme (default)
+.progress-steps--health {
+  --progress-active-color: #3b82f6;
+  --progress-active-shadow: rgba(59, 130, 246, 0.1);
+}
+
+// Dialysis - Red theme
+.progress-steps--dialysis {
+  --progress-active-color: #ef4444;
+  --progress-active-shadow: rgba(239, 68, 68, 0.1);
+}
+
+// Custom Activities - Amber/Orange theme
+.progress-steps--customActivities {
+  --progress-active-color: #f59e0b;
+  --progress-active-shadow: rgba(245, 158, 11, 0.1);
+}
+
+// Home Package - Green theme
+.progress-steps--homePackage {
+  --progress-active-color: #059669;
+  --progress-active-shadow: rgba(5, 150, 105, 0.1);
+}
+
+// ===========================================
+// RESPONSIVE - Tablet (max-width: 1024px)
+// ===========================================
+
+@media (max-width: $breakpoint-lg) {
+  .progress-steps {
+    max-width: 450px;
+  }
+}
+
+// ===========================================
+// RESPONSIVE - Mobile (max-width: 768px)
+// ===========================================
+
+@media (max-width: $breakpoint-md) {
+  .progress-steps {
+    margin: $spacing-xl auto $spacing-2xl auto;
+    max-width: 350px;
+
+    &__number {
+      width: 40px;
+      height: 40px;
+      font-size: $font-size-base;
+
+      svg {
+        width: 16px;
+        height: 16px;
+      }
+    }
+
+    &__label {
+      font-size: $font-size-xs;
+    }
+  }
+}
+
+// ===========================================
+// RESPONSIVE - Small Mobile (max-width: 480px)
+// ===========================================
+
+@media (max-width: 480px) {
+  .progress-steps {
+    margin: $spacing-lg auto $spacing-xl auto;
+    max-width: 280px;
+
+    &__number {
+      width: 36px;
+      height: 36px;
+      font-size: $font-size-sm;
+      border-width: 2px;
+
+      svg {
+        width: 14px;
+        height: 14px;
+      }
+    }
+
+    &__label {
+      font-size: 10px;
+    }
+  }
+}

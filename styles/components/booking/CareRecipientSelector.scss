@@ -1,0 +1,184 @@
+// ===========================================
+// CARE RECIPIENT SELECTOR COMPONENT
+// ===========================================
+
+.care-recipient-selector {
+  // CSS Custom Properties (inherit from parent theme)
+  --selector-active-color: var(--details-active-color, #3b82f6);
+  --selector-active-bg: var(--details-active-bg, #eff6ff);
+
+  // Mode Toggle Buttons
+  &__mode-toggle {
+    display: flex;
+    gap: $spacing-sm;
+    margin-bottom: $spacing-lg;
+    padding: $spacing-xs;
+    background: $gray-100;
+    border-radius: $radius-lg;
+  }
+
+  &__mode-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: $spacing-sm;
+    padding: $spacing-sm $spacing-md;
+    font-family: inherit;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-medium;
+    color: $gray-600;
+    background: transparent;
+    border: none;
+    border-radius: $radius-md;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    svg {
+      font-size: 0.875em;
+    }
+
+    &:hover {
+      color: $gray-900;
+      background: $gray-50;
+    }
+
+    &--active {
+      color: var(--selector-active-color);
+      background: $bg-primary;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+
+      &:hover {
+        color: var(--selector-active-color);
+        background: $bg-primary;
+      }
+    }
+  }
+
+  // Info Message (when max recipients reached)
+  &__info {
+    display: flex;
+    align-items: flex-start;
+    gap: $spacing-sm;
+    padding: $spacing-md;
+    margin-bottom: $spacing-lg;
+    background: linear-gradient(135deg, rgba(251, 191, 36, 0.1), rgba(245, 158, 11, 0.05));
+    border: 1px solid rgba(251, 191, 36, 0.3);
+    border-radius: $radius-lg;
+    font-size: $font-size-sm;
+    color: $gray-700;
+    line-height: 1.5;
+
+    svg {
+      flex-shrink: 0;
+      color: #f59e0b;
+      margin-top: 2px;
+    }
+
+    a {
+      color: var(--selector-active-color);
+      font-weight: $font-weight-semibold;
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+
+  // Dropdown for selecting saved recipients
+  &__dropdown {
+    margin-bottom: $spacing-lg;
+
+    .booking-details__select {
+      font-weight: $font-weight-medium;
+    }
+  }
+
+  // Empty state message
+  &__empty {
+    margin-top: $spacing-md;
+    padding: $spacing-md;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.05), rgba(59, 130, 246, 0.02));
+    border: 1px dashed rgba(59, 130, 246, 0.3);
+    border-radius: $radius-lg;
+
+    p {
+      margin: 0;
+      font-size: $font-size-sm;
+      color: $gray-600;
+      line-height: 1.5;
+
+      strong {
+        color: $gray-700;
+      }
+
+      a {
+        color: var(--selector-active-color);
+        font-weight: $font-weight-semibold;
+        text-decoration: none;
+
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+    }
+  }
+
+  // Disabled/readonly state for select dropdowns
+  .booking-details__select:disabled {
+    background-color: $gray-50;
+    cursor: not-allowed;
+    opacity: 0.7;
+  }
+}
+
+// ===========================================
+// THEME VARIANTS
+// ===========================================
+
+.care-recipient-selector--health {
+  --selector-active-color: #3b82f6;
+  --selector-active-bg: #eff6ff;
+}
+
+.care-recipient-selector--dialysis {
+  --selector-active-color: #ef4444;
+  --selector-active-bg: #fef2f2;
+}
+
+.care-recipient-selector--customActivities {
+  --selector-active-color: #f59e0b;
+  --selector-active-bg: #fffbeb;
+}
+
+.care-recipient-selector--homePackage {
+  --selector-active-color: #059669;
+  --selector-active-bg: #ecfdf5;
+}
+
+// ===========================================
+// RESPONSIVE - Mobile
+// ===========================================
+
+@media (max-width: $breakpoint-md) {
+  .care-recipient-selector {
+    &__mode-toggle {
+      flex-direction: column;
+    }
+
+    &__mode-btn {
+      justify-content: flex-start;
+      padding: $spacing-md;
+    }
+
+    &__info {
+      flex-direction: column;
+      text-align: center;
+
+      svg {
+        margin: 0 auto;
+      }
+    }
+  }
+}

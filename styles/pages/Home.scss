@@ -1,0 +1,16 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// ===========================================
+// HOME PAGE
+// ===========================================
+
+.home {
+  padding-top: 80px; // Space for fixed header
+  background: $gray-50;
+}
+
+.home__temp {
+  min-height: 200vh;
+  padding: $spacing-2xl;
+}

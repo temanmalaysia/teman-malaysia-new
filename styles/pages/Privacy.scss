@@ -1,0 +1,210 @@
+// Privacy Policy Page Styles
+// ===========================
+
+// Variables
+$privacy-text-color: #374151;
+$privacy-heading-color: #1f2937;
+$privacy-subheading-color: #374151;
+$privacy-muted-color: #6b7280;
+$privacy-border-color: #e5e7eb;
+$privacy-accent-color: #3b82f6;
+$privacy-bg-light: #f9fafb;
+$privacy-warning-bg: #fffbeb;
+$privacy-warning-border: #fcd34d;
+$privacy-warning-text: #92400e;
+
+// Main Section
+.privacy-section {
+  padding: 120px 0 60px 0;
+  min-height: 100vh;
+  background: #ffffff;
+
+  @media (max-width: 768px) {
+    padding: 100px 0 40px 0;
+  }
+
+  .container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 20px;
+
+    @media (max-width: 768px) {
+      padding: 0 15px;
+    }
+  }
+}
+
+// Privacy Header
+.privacy-header {
+  text-align: center;
+  margin-bottom: 40px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid $privacy-border-color;
+
+  &__title {
+    font-size: 2rem;
+    font-weight: 600;
+    color: $privacy-heading-color;
+    margin-bottom: 8px;
+
+    @media (max-width: 768px) {
+      font-size: 1.5rem;
+    }
+  }
+
+  &__date {
+    font-size: 14px;
+    color: $privacy-muted-color;
+    margin-top: 8px;
+  }
+}
+
+// Privacy Content
+.privacy-content {
+  max-width: 100%;
+  margin: 0 auto;
+
+  a {
+    color: $privacy-accent-color;
+    text-decoration: none;
+    
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: $privacy-heading-color;
+    margin: 40px 0 20px 0;
+    padding-bottom: 10px;
+    border-bottom: 1px solid $privacy-border-color;
+  }
+
+  h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: $gray-700;
+    margin: 25px 0 15px 0;
+  }
+
+  p {
+    margin-bottom: 15px;
+    line-height: 1.6;
+    text-align: justify;
+  }
+
+  ul {
+    margin: 15px 0 15px 25px;
+    list-style-type: disc;
+
+    @media (max-width: 768px) {
+      margin-left: 20px;
+    }
+  }
+
+  li {
+    margin-bottom: 6px;
+    line-height: 1.5;
+  }
+
+  ol {
+    margin: 15px 0 15px 25px;
+    list-style-type: decimal;
+
+    @media (max-width: 768px) {
+      margin-left: 20px;
+    }
+
+    li {
+      margin-bottom: 8px;
+      padding-left: 5px;
+    }
+  }
+}
+
+// Section Number
+.section-number {
+  color: $privacy-accent-color;
+  font-weight: 600;
+}
+
+// Privacy Article
+.privacy-article {
+  margin-bottom: 20px;
+}
+
+// Privacy Subsection
+.privacy-subsection {
+  margin-bottom: 15px;
+}
+
+// Link List (for opt-out options)
+.link-list {
+  margin: 15px 0;
+  list-style-type: none;
+  padding-left: 0;
+
+  li {
+    margin-bottom: 10px;
+    
+    strong {
+      color: $privacy-heading-color;
+    }
+
+    a {
+      color: $privacy-accent-color;
+      text-decoration: none;
+      word-break: break-all;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+}
+
+// Notice Boxes (reuse from Terms)
+.important-notice {
+  background: $privacy-warning-bg;
+  border: 1px solid $privacy-border-color;
+  border-left: 4px solid $privacy-warning-text;
+  padding: 20px;
+  margin-bottom: 30px;
+  border-radius: 4px;
+
+  strong {
+    color: $privacy-warning-text;
+  }
+
+  p {
+    margin-bottom: 0;
+  }
+}
+
+.company-info {
+  background: $privacy-bg-light;
+  border: 1px solid $privacy-border-color;
+  padding: 20px;
+  margin-bottom: 30px;
+  border-radius: 4px;
+
+  p {
+    margin-bottom: 0;
+  }
+}
+
+// Signature
+.privacy-signature {
+  text-align: start;
+  margin-top: 40px;
+  padding-top: 20px;
+  border-top: 1px solid $privacy-border-color;
+  font-weight: 500;
+  color: $privacy-subheading-color;
+
+  p {
+    margin-bottom: 5px;
+  }
+}

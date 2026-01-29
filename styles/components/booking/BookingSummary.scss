@@ -1,0 +1,602 @@
+// ===========================================
+// BOOKING SUMMARY COMPONENT STYLES
+// ===========================================
+
+.booking-summary {
+  padding: $spacing-2xl;
+
+  // ===========================================
+  // THEME VARIABLES
+  // ===========================================
+
+  --summary-primary-color: #3b82f6;
+  --summary-primary-bg: #f0f9ff;
+  --summary-primary-border: #bfdbfe;
+  --summary-success-color: #059669;
+  --summary-warning-color: #ea580c;
+  --summary-tips-bg: #fef3c7;
+  --summary-tips-border: #fcd34d;
+  --summary-tips-color: #92400e;
+
+  &--health {
+    --summary-primary-color: #3b82f6;
+    --summary-primary-bg: #f0f9ff;
+    --summary-primary-border: #bfdbfe;
+  }
+
+  &--dialysis {
+    --summary-primary-color: #ef4444;
+    --summary-primary-bg: #fef2f2;
+    --summary-primary-border: #fecaca;
+  }
+
+  &--customActivities {
+    --summary-primary-color: #f59e0b;
+    --summary-primary-bg: #fffbeb;
+    --summary-primary-border: #fed7aa;
+  }
+
+  &--homePackage {
+    --summary-primary-color: #059669;
+    --summary-primary-bg: #f0fdf4;
+    --summary-primary-border: #bbf7d0;
+  }
+
+  // ===========================================
+  // TITLE
+  // ===========================================
+
+  &__title {
+    font-size: $font-size-3xl;
+    font-weight: $font-weight-semibold;
+    color: $gray-900;
+    margin-bottom: $spacing-2xl;
+    text-align: center;
+  }
+
+  // ===========================================
+  // CARDS CONTAINER
+  // ===========================================
+
+  &__cards {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-lg;
+    margin-bottom: $spacing-2xl;
+  }
+
+  // ===========================================
+  // CARD
+  // ===========================================
+
+  &__card {
+    background: $gray-50;
+    border-radius: $radius-xl;
+    padding: $spacing-xl;
+    border: 1px solid $gray-200;
+
+    // Main card (service details) - themed background
+    &--main {
+      background: $gray-50;
+      border-color: 1px solid $gray-200;
+    }
+  }
+
+  &__card-title {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-semibold;
+    color: $gray-900;
+    margin-bottom: $spacing-md;
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+
+    svg {
+      color: var(--summary-primary-color);
+      flex-shrink: 0;
+    }
+  }
+
+  // ===========================================
+  // SUMMARY ITEM
+  // ===========================================
+
+  &__item {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: $spacing-sm 0;
+    gap: $spacing-md;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+
+    &:last-of-type:not(&--cost) {
+      border-bottom: none;
+    }
+
+    // Cost item styling
+    &--cost {
+      margin-top: $spacing-md;
+      padding-top: $spacing-md;
+      border-top: 2px solid var(--summary-primary-color);
+      border-bottom: none;
+    }
+  }
+
+  &__label {
+    font-size: $font-size-sm;
+    color: $gray-600;
+    flex-shrink: 0;
+  }
+
+  &__value {
+    font-size: $font-size-sm;
+    color: $gray-900;
+    font-weight: $font-weight-medium;
+    text-align: right;
+    word-break: break-word;
+    text-transform: capitalize;
+
+    // Cost value styling
+    &--cost {
+      font-size: $font-size-xl;
+      font-weight: $font-weight-bold;
+      color: var(--summary-primary-color);
+    }
+
+    &--raw {
+      text-transform: none;
+    }
+  }
+
+  // Cost note styling
+  &__cost-note {
+    font-size: $font-size-xs;
+    color: $gray-500;
+    font-style: italic;
+    margin-top: $spacing-sm;
+    padding-top: $spacing-sm;
+  }
+
+  // ===========================================
+  // TIPS BOX (Custom Activities)
+  // ===========================================
+
+  &__tips-box {
+    background: var(--summary-tips-bg);
+    border: 1px solid var(--summary-tips-border);
+    border-radius: $radius-lg;
+    padding: $spacing-lg;
+    margin-bottom: $spacing-xl;
+
+    h3 {
+      display: flex;
+      align-items: center;
+      gap: $spacing-sm;
+      color: var(--summary-tips-color);
+      font-size: $font-size-lg;
+      font-weight: $font-weight-semibold;
+      margin-bottom: $spacing-md;
+
+      svg {
+        flex-shrink: 0;
+      }
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    li {
+      display: flex;
+      align-items: flex-start;
+      gap: $spacing-sm;
+      margin-bottom: $spacing-sm;
+      color: var(--summary-tips-color);
+      font-size: $font-size-sm;
+      padding-left: $spacing-lg;
+      position: relative;
+
+      &::before {
+        content: '•';
+        position: absolute;
+        left: 0;
+        color: var(--summary-tips-color);
+      }
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+
+  // ===========================================
+  // WARNING BOX (Home Package)
+  // ===========================================
+
+  &__warning-box {
+    background: #fffbeb;
+    border: 1px solid #fed7aa;
+    border-radius: $radius-lg;
+    padding: $spacing-lg;
+    margin-bottom: $spacing-xl;
+
+    h3 {
+      display: flex;
+      align-items: center;
+      gap: $spacing-sm;
+      color: #ea580c;
+      font-size: $font-size-lg;
+      font-weight: $font-weight-semibold;
+      margin-bottom: $spacing-md;
+
+      svg {
+        flex-shrink: 0;
+      }
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    li {
+      display: flex;
+      align-items: flex-start;
+      gap: $spacing-sm;
+      margin-bottom: $spacing-sm;
+      color: #ea580c;
+      font-size: $font-size-sm;
+      padding-left: $spacing-lg;
+      position: relative;
+
+      &::before {
+        content: '•';
+        position: absolute;
+        left: 0;
+        color: #ea580c;
+      }
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+
+  // ===========================================
+  // INFO BOX (What Happens Next)
+  // ===========================================
+
+  &__info-box {
+    background: var(--summary-primary-bg);
+    border: 1px solid var(--summary-primary-border);
+    border-radius: $radius-xl;
+    padding: $spacing-xl;
+    margin-bottom: $spacing-xl;
+  }
+
+  &__info-title {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+    font-size: $font-size-xl;
+    font-weight: $font-weight-semibold;
+    color: var(--summary-primary-color);
+    margin-bottom: $spacing-lg;
+
+    svg {
+      flex-shrink: 0;
+    }
+  }
+
+  &__info-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+
+    li {
+      display: flex;
+      align-items: flex-start;
+      gap: $spacing-md;
+      padding: $spacing-sm 0;
+      color: var(--summary-primary-color);
+      font-size: $font-size-sm;
+
+      svg {
+        color: var(--summary-primary-color);
+        flex-shrink: 0;
+        margin-top: 2px;
+      }
+
+      &:not(:last-child) {
+        border-bottom: 1px dashed var(--summary-primary-border);
+      }
+    }
+  }
+
+  // ===========================================
+  // TERMS CHECKBOX
+  // ===========================================
+
+  &__checkbox {
+    display: flex;
+    align-items: flex-start;
+    gap: $spacing-md;
+    cursor: pointer;
+    margin-bottom: $spacing-xl;
+    padding: $spacing-lg;
+    background: $gray-50;
+    border-radius: $radius-lg;
+    border: 1px solid $gray-200;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: $gray-100;
+    }
+
+    input {
+      display: none;
+    }
+
+    input:checked + .booking-summary__checkmark {
+      background: var(--summary-primary-color);
+      border-color: var(--summary-primary-color);
+
+      &::after {
+        display: block;
+      }
+    }
+  }
+
+  &__checkmark {
+    width: 22px;
+    height: 22px;
+    min-width: 22px;
+    border: 2px solid $gray-400;
+    border-radius: $radius-sm;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    margin-top: 2px;
+
+    &::after {
+      content: '';
+      display: none;
+      width: 6px;
+      height: 12px;
+      border: solid white;
+      border-width: 0 2px 2px 0;
+      transform: rotate(45deg);
+      margin-bottom: 2px;
+    }
+  }
+
+  &__checkbox-text {
+    font-size: $font-size-sm;
+    color: $gray-700;
+    line-height: 1.5;
+
+    a {
+      color: var(--summary-primary-color);
+      text-decoration: underline;
+
+      &:hover {
+        text-decoration: none;
+      }
+    }
+  }
+
+  // ===========================================
+  // ACTION BUTTONS
+  // ===========================================
+
+  &__actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: $spacing-lg;
+    padding-top: $spacing-xl;
+    border-top: 1px solid $gray-200;
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: $spacing-sm;
+      padding: $spacing-md $spacing-xl;
+      font-size: $font-size-base;
+      font-weight: $font-weight-semibold;
+      border-radius: $radius-lg;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-decoration: none;
+
+      svg {
+        flex-shrink: 0;
+      }
+    }
+
+    .btn--outline {
+      background: transparent;
+      border: 2px solid var(--summary-primary-color);
+      color: var(--summary-primary-color);
+
+      &:hover {
+        background: var(--summary-primary-bg);
+      }
+    }
+
+    .btn--payment {
+      background: var(--summary-success-color);
+      border: 2px solid var(--summary-success-color);
+      color: white;
+      padding: $spacing-md $spacing-2xl;
+
+      &:hover:not(:disabled) {
+        background: darken(#059669, 5%);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);
+      }
+
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+    }
+
+    .btn--primary {
+      background: var(--summary-primary-color);
+      border: 2px solid var(--summary-primary-color);
+      color: white;
+
+      &:hover {
+        background: darken(#3b82f6, 5%);
+      }
+    }
+  }
+
+  // ===========================================
+  // SPINNER
+  // ===========================================
+
+  &__spinner {
+    width: 18px;
+    height: 18px;
+    border: 2px solid transparent;
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  // ===========================================
+  // RESPONSIVE - Tablet
+  // ===========================================
+
+  @media (max-width: 768px) {
+    padding: $spacing-xl;
+
+    &__title {
+      font-size: $font-size-2xl;
+    }
+
+    &__card {
+      padding: $spacing-lg;
+    }
+
+    &__card-title {
+      font-size: $font-size-base;
+    }
+
+    &__item {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 4px;
+    }
+
+    &__value {
+      text-align: left;
+    }
+
+    &__info-box {
+      padding: $spacing-lg;
+    }
+
+    &__info-title {
+      font-size: $font-size-base;
+    }
+
+    &__info-list li {
+      font-size: $font-size-xs;
+    }
+
+    &__actions {
+      flex-direction: column-reverse;
+      gap: $spacing-md;
+
+      .btn {
+        width: 100%;
+        justify-content: center;
+      }
+
+      .btn--payment {
+        font-size: $font-size-base;
+        padding: $spacing-md $spacing-xl;
+      }
+    }
+
+    &__modal-content {
+      padding: $spacing-lg;
+      margin: $spacing-md;
+
+      h2 {
+        font-size: $font-size-xl;
+      }
+    }
+
+    &__modal-actions {
+      flex-direction: column;
+
+      .btn {
+        width: 100%;
+        max-width: none;
+      }
+    }
+  }
+
+  // ===========================================
+  // RESPONSIVE - Small Mobile
+  // ===========================================
+
+  @media (max-width: 480px) {
+    padding: $spacing-md;
+
+    &__title {
+      font-size: $font-size-lg;
+    }
+
+    &__card {
+      padding: $spacing-sm $spacing-md;
+    }
+
+    &__card-title {
+      font-size: $font-size-sm;
+      gap: $spacing-xs;
+
+      svg {
+        width: 16px;
+        height: 16px;
+      }
+    }
+
+    &__label,
+    &__value {
+      font-size: $font-size-xs;
+    }
+
+    &__value--cost {
+      font-size: $font-size-lg;
+    }
+
+    &__checkbox {
+      padding: $spacing-md;
+    }
+
+    &__checkbox-text {
+      font-size: $font-size-xs;
+    }
+
+    &__modal-icon svg {
+      width: 48px;
+      height: 48px;
+    }
+  }
+}

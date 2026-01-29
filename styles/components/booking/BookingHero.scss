@@ -1,0 +1,334 @@
+// ===========================================
+// UNIFIED BOOKING HERO COMPONENT
+// ===========================================
+
+.booking-hero {
+  // CSS Custom Properties (defaults to health/blue theme)
+  --hero-icon-bg: #3b82f6;
+  --hero-icon-shadow: rgba(59, 130, 246, 0.2);
+  --hero-card-border: #e5f3ff;
+
+  padding: 10px 0 0 0; // Removed bottom padding
+  min-height: auto;
+  background: $gray-50;
+
+  // Back Link
+  &__back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: $spacing-sm;
+    color: $gray-500;
+    text-decoration: none;
+    margin-bottom: $spacing-xl;
+    font-size: $font-size-sm;
+    transition: color $transition-base;
+
+    &:hover {
+      color: var(--hero-icon-bg);
+    }
+
+    svg {
+      flex-shrink: 0;
+    }
+  }
+
+  // Header
+  &__header {
+    text-align: center;
+    margin-bottom: 60px;
+  }
+
+  &__title {
+    font-size: $font-size-4xl;
+    font-weight: $font-weight-bold;
+    color: $gray-900;
+    margin-bottom: $spacing-md;
+  }
+
+  &__subtitle {
+    font-size: $font-size-xl;
+    color: $gray-500;
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+  // Service Info Card - fills container width
+  &__card {
+    background: $bg-primary;
+    border-radius: $radius-2xl;
+    padding: $spacing-2xl;
+    box-shadow: $shadow-sm;
+    border: 2px solid var(--hero-card-border);
+    width: 100%; // Fill container
+  }
+
+  // Container controls the width
+  .container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0;
+
+    @media (max-width: 880px) {
+      max-width: 100%;
+      padding: 0 $spacing-lg;
+    }
+
+    @media (max-width: $breakpoint-md) {
+      padding: 0 $spacing-md;
+    }
+
+    @media (max-width: 480px) {
+      padding: 0 $spacing-sm;
+    }
+  }
+
+  &__card-header {
+    display: flex;
+    align-items: center;
+    gap: $spacing-lg;
+    margin-bottom: $spacing-xl;
+  }
+
+  &__icon {
+    width: 60px;
+    height: 60px;
+    background: var(--hero-icon-bg);
+    border-radius: $radius-xl;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 4px 12px var(--hero-icon-shadow);
+
+    svg {
+      color: white;
+    }
+  }
+
+  &__card-title {
+    font-size: $font-size-2xl;
+    font-weight: $font-weight-semibold;
+    color: $gray-900;
+    margin: 0;
+  }
+
+  &__card-description {
+    font-size: $font-size-base;
+    color: $gray-600;
+    line-height: 1.7;
+    margin-bottom: $spacing-xl;
+  }
+
+  // Features Grid (default - 2 columns)
+  &__features {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: $spacing-md;
+  }
+
+  &__feature {
+    display: flex;
+    align-items: flex-start;
+    gap: $spacing-sm;
+    font-size: $font-size-sm;
+    color: $gray-700;
+
+    svg {
+      color: #10b981;
+      flex-shrink: 0;
+      margin-top: 3px;
+    }
+  }
+
+  // Features Box (used by homePackage)
+  &__features-box {
+    background: #ecfdf5;
+    border: 1px solid #a7f3d0;
+    border-radius: $radius-lg;
+    padding: $spacing-lg;
+    margin-top: $spacing-lg;
+  }
+
+  &__features-box-title {
+    color: #047857;
+    font-size: $font-size-base;
+    font-weight: $font-weight-semibold;
+    margin-bottom: $spacing-md;
+  }
+
+  &__features-box-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: $spacing-sm $spacing-md;
+
+    .booking-hero__feature {
+      color: $gray-700;
+
+      svg {
+        color: #059669;
+      }
+    }
+  }
+}
+
+// ===========================================
+// THEME VARIATIONS
+// ===========================================
+
+// Health Appointments - Blue theme (default)
+.booking-hero--health {
+  --hero-icon-bg: #3b82f6;
+  --hero-icon-shadow: rgba(59, 130, 246, 0.2);
+  --hero-card-border: #e5f3ff;
+}
+
+// Dialysis - Red theme
+.booking-hero--dialysis {
+  --hero-icon-bg: #ef4444;
+  --hero-icon-shadow: rgba(239, 68, 68, 0.2);
+  --hero-card-border: #fee2e2;
+}
+
+// Custom Activities - Amber/Orange theme
+.booking-hero--customActivities {
+  --hero-icon-bg: #f59e0b;
+  --hero-icon-shadow: rgba(245, 158, 11, 0.2);
+  --hero-card-border: #fef3c7;
+}
+
+// Home Package - Green theme
+.booking-hero--homePackage {
+  --hero-icon-bg: #059669;
+  --hero-icon-shadow: rgba(5, 150, 105, 0.2);
+  --hero-card-border: #d1fae5;
+}
+
+// ===========================================
+// RESPONSIVE - Tablet (max-width: 1024px)
+// ===========================================
+
+@media (max-width: $breakpoint-lg) {
+  .booking-hero {
+
+    &__header {
+      margin-bottom: 40px;
+    }
+
+    &__title {
+      font-size: $font-size-3xl;
+    }
+
+    &__subtitle {
+      font-size: $font-size-lg;
+    }
+
+    &__card {
+      padding: $spacing-xl;
+    }
+
+    &__icon {
+      width: 52px;
+      height: 52px;
+    }
+
+    &__card-title {
+      font-size: $font-size-xl;
+    }
+  }
+}
+
+// ===========================================
+// RESPONSIVE - Mobile (max-width: 768px)
+// ===========================================
+
+@media (max-width: $breakpoint-md) {
+  .booking-hero {
+
+    &__back-link {
+      margin-bottom: $spacing-lg;
+    }
+
+    &__header {
+      margin-bottom: 30px;
+    }
+
+    &__title {
+      font-size: $font-size-2xl;
+    }
+
+    &__subtitle {
+      font-size: $font-size-base;
+      padding: 0 $spacing-sm;
+    }
+
+    &__card {
+      padding: $spacing-lg;
+      border-radius: $radius-xl;
+    }
+
+    &__card-header {
+      gap: $spacing-md;
+      margin-bottom: $spacing-lg;
+    }
+
+    &__icon {
+      width: 48px;
+      height: 48px;
+
+      svg {
+        width: 20px;
+        height: 20px;
+      }
+    }
+
+    &__card-title {
+      font-size: $font-size-lg;
+    }
+
+    &__card-description {
+      font-size: $font-size-sm;
+      margin-bottom: $spacing-lg;
+    }
+
+    &__features {
+      grid-template-columns: 1fr;
+      gap: $spacing-sm;
+    }
+
+    &__feature {
+      font-size: $font-size-xs;
+    }
+
+    &__features-box-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+}
+
+// ===========================================
+// RESPONSIVE - Small Mobile (max-width: 480px)
+// ===========================================
+
+@media (max-width: 480px) {
+  .booking-hero {
+
+    &__back-link {
+      font-size: $font-size-xs;
+      margin-bottom: $spacing-md;
+    }
+
+    &__title {
+      font-size: $font-size-xl;
+    }
+
+    &__card {
+      padding: $spacing-md;
+    }
+
+    &__icon {
+      width: 44px;
+      height: 44px;
+    }
+  }
+}

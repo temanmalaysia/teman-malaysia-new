@@ -1,0 +1,299 @@
+// ===========================================
+// SERVICES GRID SECTION
+// ===========================================
+
+// Blue color for booking page
+$booking-blue: #3b82f6;
+$booking-blue-dark: #2563eb;
+$booking-blue-light: #eff6ff;
+$booking-green: #10b981;
+
+.services-grid-section {
+  background: $gray-50;
+  padding-bottom: $spacing-4xl;
+}
+
+// Services Grid
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+// Service Card
+.service-card {
+  background: $bg-primary;
+  border-radius: $radius-2xl;
+  padding: $spacing-2xl;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  border: 2px solid transparent;
+  transition: all $transition-base;
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+  display: block;
+
+  &:hover {
+    border-color: $booking-blue;
+    box-shadow: 0 8px 25px rgba($booking-blue, 0.15);
+    transform: translateY(-4px);
+  }
+
+  // Header
+  &__header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    margin-bottom: $spacing-lg;
+  }
+
+  // Icon
+  &__icon {
+    width: 60px;
+    height: 60px;
+    background: $booking-blue;
+    border-radius: $radius-xl;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-bottom: $spacing-md;
+
+    svg {
+      color: $text-white;
+      width: 24px;
+      height: 24px;
+    }
+  }
+
+  // Info
+  &__info {
+    flex: 1;
+  }
+
+  // Title
+  &__title {
+    font-size: $font-size-2xl;
+    font-weight: $font-weight-semibold;
+    color: $gray-900;
+    margin-bottom: $spacing-sm;
+  }
+
+  // Description
+  &__description {
+    color: $gray-500;
+    font-size: $font-size-base;
+    line-height: 1.5;
+    margin-bottom: $spacing-md;
+  }
+
+  // Features
+  &__features {
+    margin: $spacing-lg 0;
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    li {
+      display: flex;
+      align-items: center;
+      gap: $spacing-sm;
+      margin-bottom: $spacing-sm;
+      font-size: $font-size-sm;
+      color: $gray-600;
+
+      svg {
+        color: $booking-green;
+        flex-shrink: 0;
+      }
+    }
+  }
+
+  // Pricing
+  &__pricing {
+    background: $gray-50;
+    border-radius: $radius-lg;
+    padding: $spacing-md;
+    margin-top: $spacing-lg;
+  }
+
+  &__pricing-title {
+    font-weight: $font-weight-semibold;
+    color: $gray-900;
+    margin-bottom: $spacing-sm;
+    font-size: $font-size-sm;
+  }
+
+  &__price {
+    font-size: $font-size-xl;
+    font-weight: $font-weight-bold;
+    color: $booking-blue;
+    margin-bottom: $spacing-sm;
+  }
+
+  &__pricing-note {
+    font-size: $font-size-xs;
+    color: $gray-500;
+    margin-bottom: 4px;
+  }
+
+  // CTA
+  &__cta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: $spacing-xl;
+    padding-top: $spacing-lg;
+    border-top: 1px solid $gray-200;
+  }
+
+  &__cta-text {
+    font-weight: $font-weight-medium;
+    color: $booking-blue;
+    font-size: $font-size-sm;
+  }
+
+  &__cta-arrow {
+    color: $booking-blue;
+    transition: transform $transition-base;
+  }
+
+  &:hover &__cta-arrow {
+    transform: translateX(4px);
+  }
+}
+
+// ===========================================
+// RESPONSIVE - Tablet (max-width: 1024px)
+// ===========================================
+
+@media (max-width: $breakpoint-lg) {
+  .services-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: $spacing-md;
+  }
+
+  .service-card {
+    &__title {
+      font-size: $font-size-xl;
+    }
+  }
+}
+
+// ===========================================
+// RESPONSIVE - Mobile (max-width: 768px)
+// ===========================================
+
+@media (max-width: $breakpoint-md) {
+  .services-grid-section {
+    padding-bottom: $spacing-2xl;
+  }
+
+  .services-grid {
+    grid-template-columns: 1fr;
+    gap: $spacing-lg;
+  }
+
+  .service-card {
+    padding: $spacing-xl;
+
+    &__header {
+      flex-direction: column;
+      text-align: center;
+    }
+
+    &__icon {
+      margin-bottom: $spacing-md;
+    }
+
+    &__title {
+      font-size: $font-size-xl;
+    }
+
+    &__description {
+      font-size: $font-size-sm;
+    }
+
+    &__features li {
+      font-size: $font-size-xs;
+    }
+
+    &__price {
+      font-size: $font-size-lg;
+    }
+
+    &__cta-text {
+      font-size: $font-size-xs;
+    }
+  }
+}
+
+// ===========================================
+// RESPONSIVE - Small Mobile (max-width: 480px)
+// ===========================================
+
+@media (max-width: 480px) {
+  .services-grid {
+    gap: $spacing-md;
+  }
+
+  .service-card {
+    padding: $spacing-lg;
+
+    &__icon {
+      width: 50px;
+      height: 50px;
+
+      svg {
+        width: 20px;
+        height: 20px;
+      }
+    }
+
+    &__title {
+      font-size: $font-size-lg;
+    }
+
+    &__pricing {
+      padding: $spacing-sm;
+    }
+
+    &__cta {
+      flex-direction: column;
+      gap: $spacing-sm;
+      text-align: center;
+    }
+
+    &__cta-arrow {
+      display: none;
+    }
+  }
+}
+
+// ===========================================
+// REDUCED MOTION
+// ===========================================
+
+@media (prefers-reduced-motion: reduce) {
+  .service-card {
+    transition: none;
+
+    &:hover {
+      transform: none;
+    }
+
+    &__cta-arrow {
+      transition: none;
+    }
+
+    &:hover &__cta-arrow {
+      transform: none;
+    }
+  }
+}

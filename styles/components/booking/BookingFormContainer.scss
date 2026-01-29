@@ -1,0 +1,77 @@
+// ===========================================
+// BOOKING FORM CONTAINER
+// ===========================================
+
+.booking-form-section {
+  background: $gray-50;
+  padding-top: $spacing-2xl;
+  padding-bottom: $spacing-4xl;
+
+  // Container controls the width (same as BookingHero)
+  .container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0;
+
+    @media (max-width: 880px) {
+      max-width: 100%;
+      padding: 0 $spacing-lg;
+    }
+
+    @media (max-width: $breakpoint-md) {
+      padding: 0 $spacing-md;
+    }
+
+    @media (max-width: 480px) {
+      padding: 0 $spacing-sm;
+    }
+  }
+}
+
+// Form container fills the container width
+.booking-form-container {
+  width: 100%;
+  background: $bg-primary;
+  border-radius: $radius-2xl;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+}
+
+// ===========================================
+// RESPONSIVE - 880px (800px card + margins)
+// ===========================================
+
+@media (max-width: 880px) {
+  .booking-form-section {
+    padding-top: $spacing-xl;
+  }
+}
+
+// ===========================================
+// RESPONSIVE - Mobile (max-width: 768px)
+// ===========================================
+
+@media (max-width: $breakpoint-md) {
+  .booking-form-section {
+    padding-top: $spacing-lg;
+    padding-bottom: $spacing-2xl;
+  }
+
+  .booking-form-container {
+    border-radius: $radius-xl;
+  }
+}
+
+// ===========================================
+// RESPONSIVE - Small Mobile (max-width: 480px)
+// ===========================================
+
+@media (max-width: 480px) {
+  .booking-form-section {
+    padding-top: $spacing-md;
+  }
+
+  .booking-form-container {
+    border-radius: $radius-lg;
+  }
+}

@@ -1,0 +1,120 @@
+// ==============================================
+// CAREERS READY TO JOIN (CTA) SECTION STYLES
+// ==============================================
+
+// Variables
+$secondary-color: #fec743;
+$gray-800: #1f2937;
+$gray-900: #111827;
+$white: #ffffff;
+$shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+$radius-lg: 0.5rem;
+$transition-fast: 150ms ease-in-out;
+
+.careers-ready-to-join {
+  background: $secondary-color;
+  color: $gray-900;
+  text-align: center;
+  padding: 3rem 0;
+
+  &__content {
+    max-width: 700px;
+    margin: 0 auto;
+  }
+
+  &__title {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: $gray-900;
+  }
+
+  &__subtitle {
+    font-size: 1.25rem;
+    margin-bottom: 2rem;
+    opacity: 0.8;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.6;
+  }
+}
+
+// ==============================================
+// BUTTON STYLES
+// ==============================================
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border: 2px solid transparent;
+  border-radius: $radius-lg;
+  font-weight: 500;
+  font-size: 0.875rem;
+  text-decoration: none;
+  cursor: pointer;
+  transition: $transition-fast;
+  white-space: nowrap;
+  background: none;
+  font-family: inherit;
+
+  &--dark {
+    background: $gray-900;
+    color: $white;
+    border: none;
+
+    &:hover {
+      background: $gray-800;
+      transform: translateY(-2px);
+      box-shadow: $shadow-lg;
+    }
+  }
+
+  &--large {
+    padding: 1rem 2rem;
+    font-size: 1rem;
+  }
+}
+
+// ==============================================
+// RESPONSIVE DESIGN
+// ==============================================
+
+@media (max-width: 768px) {
+  .careers-ready-to-join {
+    padding: 2.5rem 0;
+
+    &__title {
+      font-size: 1.75rem;
+    }
+
+    &__subtitle {
+      font-size: 1.1rem;
+      margin-bottom: 1.5rem;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .careers-ready-to-join {
+    padding: 2rem 0;
+
+    &__title {
+      font-size: 1.5rem;
+    }
+
+    &__subtitle {
+      font-size: 1rem;
+    }
+  }
+
+  .btn {
+    &--large {
+      padding: 0.875rem 1.5rem;
+      font-size: 0.9rem;
+    }
+  }
+}

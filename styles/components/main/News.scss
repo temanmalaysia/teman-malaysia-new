@@ -1,0 +1,120 @@
+// ===========================================
+// NEWS SECTION
+// ===========================================
+
+.news {
+  background: $text-white;
+}
+
+// ===========================================
+// NEWS CAROUSEL
+// ===========================================
+
+.news__carousel {
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+}
+
+.news__track {
+  display: flex;
+  animation: scroll 20s linear infinite;
+  gap: 2rem;
+  width: fit-content;
+
+  &:hover {
+    animation-play-state: paused;
+  }
+}
+
+.news__item {
+  flex: 0 0 200px;
+  text-align: center;
+  opacity: 0.7;
+  transition: $transition-fast;
+
+  &:hover {
+    opacity: 1;
+  }
+
+  a {
+    display: block;
+  }
+}
+
+.news__logo {
+  height: 60px;
+  width: auto;
+  max-width: 150px;
+  object-fit: contain;
+  margin: 0 auto;
+  transition: $transition-fast;
+  filter: grayscale(30%);
+}
+
+.news__item:hover .news__logo {
+  filter: grayscale(0%);
+  transform: scale(1.05);
+}
+
+// ===========================================
+// SCROLL ANIMATION
+// ===========================================
+
+@keyframes scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+// ===========================================
+// RESPONSIVE - Tablet (max-width: 1024px)
+// ===========================================
+
+@media (max-width: $breakpoint-lg) {
+  .news__track {
+    gap: 1.5rem;
+  }
+
+  .news__item {
+    flex: 0 0 180px;
+  }
+}
+
+// ===========================================
+// RESPONSIVE - Mobile (max-width: 768px)
+// ===========================================
+
+@media (max-width: $breakpoint-md) {
+  .news__item {
+    flex: 0 0 150px;
+  }
+
+  .news__logo {
+    height: 45px;
+    max-width: 120px;
+  }
+}
+
+// ===========================================
+// RESPONSIVE - Small Mobile (max-width: 480px)
+// ===========================================
+
+@media (max-width: 480px) {
+  .news__track {
+    gap: 1rem;
+    animation-duration: 15s;
+  }
+
+  .news__item {
+    flex: 0 0 120px;
+  }
+
+  .news__logo {
+    height: 35px;
+    max-width: 100px;
+  }
+}

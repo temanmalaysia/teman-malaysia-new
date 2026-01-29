@@ -1,0 +1,222 @@
+// ===========================================
+// ABOUT PAGE - VIDEO SECTION
+// ===========================================
+
+.video-section {
+  background: linear-gradient(135deg, $primary-color 0%, $secondary-color 100%);
+  position: relative;
+  overflow: hidden;
+  padding: $spacing-4xl 0;
+
+  // Floating background effect
+  &::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+    animation: videoFloat 15s ease-in-out infinite;
+    z-index: 1;
+  }
+
+  .container {
+    position: relative;
+    z-index: 2;
+  }
+
+  &__hero {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: $spacing-2xl;
+    align-items: center;
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+
+  &__content {
+    text-align: center;
+    color: $gray-900;
+    margin-bottom: $spacing-xl;
+  }
+
+  &__title {
+    font-size: $font-size-4xl;
+    font-weight: $font-weight-bold;
+    margin-bottom: $spacing-md;
+    text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.3);
+  }
+
+  &__description {
+    font-size: $font-size-xl;
+    margin-bottom: $spacing-xl;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    opacity: 0.9;
+    line-height: 1.6;
+  }
+
+  &__wrapper {
+    position: relative;
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    border-radius: $radius-2xl;
+    overflow: hidden;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+    background: $bg-primary;
+    padding: $spacing-md;
+    transform: perspective(1000px) rotateX(5deg);
+    transition: all $transition-base;
+
+    &:hover {
+      transform: perspective(1000px) rotateX(0deg) translateY(-10px);
+      box-shadow: 0 35px 70px rgba(0, 0, 0, 0.4);
+    }
+  }
+
+  &__embed {
+    position: relative;
+    width: 100%;
+    height: 0;
+    padding-bottom: 56.25%; // 16:9 aspect ratio
+    border-radius: $radius-xl;
+    overflow: hidden;
+
+    iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+  }
+}
+
+// Float animation
+@keyframes videoFloat {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-20px) rotate(5deg);
+  }
+}
+
+// ===========================================
+// RESPONSIVE - Desktop (min-width: 1200px)
+// ===========================================
+
+@media (min-width: $breakpoint-xl) {
+  .video-section {
+    &__hero {
+      grid-template-columns: 1fr 1.2fr;
+      gap: $spacing-4xl;
+      align-items: center;
+    }
+
+    &__content {
+      text-align: left;
+      margin-bottom: 0;
+    }
+
+    &__title {
+      font-size: $font-size-5xl;
+    }
+
+    &__description {
+      font-size: 1.375rem;
+      margin-left: 0;
+      margin-right: 0;
+    }
+  }
+}
+
+// ===========================================
+// RESPONSIVE - Tablet (max-width: 1024px)
+// ===========================================
+
+@media (max-width: $breakpoint-lg) {
+  .video-section {
+    &__hero {
+      gap: $spacing-2xl;
+    }
+
+    &__title {
+      font-size: $font-size-3xl;
+    }
+
+    &__description {
+      font-size: $font-size-lg;
+    }
+  }
+}
+
+// ===========================================
+// RESPONSIVE - Mobile (max-width: 768px)
+// ===========================================
+
+@media (max-width: $breakpoint-md) {
+  .video-section {
+    padding: $spacing-2xl 0;
+
+    &__title {
+      font-size: $font-size-2xl;
+    }
+
+    &__description {
+      font-size: $font-size-base;
+    }
+
+    &__wrapper {
+      padding: $spacing-sm;
+      transform: none;
+
+      &:hover {
+        transform: translateY(-5px);
+      }
+    }
+  }
+}
+
+// ===========================================
+// RESPONSIVE - Small Mobile (max-width: 480px)
+// ===========================================
+
+@media (max-width: 480px) {
+  .video-section {
+    padding: $spacing-xl 0;
+
+    &__title {
+      font-size: $font-size-xl;
+    }
+
+    &__description {
+      font-size: $font-size-sm;
+    }
+  }
+}
+
+// ===========================================
+// REDUCED MOTION
+// ===========================================
+
+@media (prefers-reduced-motion: reduce) {
+  .video-section {
+    &::before {
+      animation: none;
+    }
+
+    &__wrapper {
+      transform: none;
+      transition: none;
+
+      &:hover {
+        transform: none;
+      }
+    }
+  }
+}

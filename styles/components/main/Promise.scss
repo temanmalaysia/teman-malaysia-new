@@ -1,0 +1,170 @@
+// ===========================================
+// PROMISE SECTION
+// ===========================================
+@use "../../variables" as *;
+
+.promise {
+  background: linear-gradient(135deg, $primary-color, $primary-dark);
+  color: $text-white;
+  text-align: center;
+
+  // Ensure all text inside is white
+  h2, h3, p {
+    color: $text-white;
+  }
+}
+
+.promise__content {
+  margin-bottom: 3rem;
+}
+
+.promise__title {
+  font-size: 1.875rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+  color: $text-white !important;
+}
+
+.promise__divider {
+  width: 50px;
+  height: 3px;
+  background: $text-white;
+  margin: 0.75rem auto;
+  border-radius: $radius-full;
+}
+
+.promise__text {
+  font-size: 1rem;
+  opacity: 0.9;
+  margin-bottom: 0;
+  color: $text-white !important;
+}
+
+// ===========================================
+// VALUE CARDS
+// ===========================================
+
+.promise__values {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+}
+
+.value-card {
+  // Semi-transparent white background - NOT solid white
+  background: rgba(255, 255, 255, 0.1) !important;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: $radius-xl;
+  padding: 2rem;
+  text-align: center;
+  // Remove any borders that might be added
+  border: none;
+}
+
+.value-card__icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  color: $text-white !important;
+
+  svg {
+    width: 48px;
+    height: 48px;
+    color: $text-white !important;
+    fill: $text-white;
+  }
+}
+
+.value-card__title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0;
+  color: $text-white !important;
+}
+
+// ===========================================
+// RESPONSIVE - Tablet (max-width: 1024px)
+// ===========================================
+
+@media (max-width: $breakpoint-lg) {
+  .promise__values {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+  }
+
+  .value-card {
+    padding: 1.5rem;
+  }
+}
+
+// ===========================================
+// RESPONSIVE - Mobile (max-width: 768px)
+// ===========================================
+
+@media (max-width: $breakpoint-md) {
+  .promise__title {
+    font-size: 1.75rem;
+  }
+
+  .promise__values {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .value-card {
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    text-align: left;
+  }
+
+  .value-card__icon {
+    font-size: 2rem;
+    margin-bottom: 0;
+    flex-shrink: 0;
+
+    svg {
+      width: 40px;
+      height: 40px;
+    }
+  }
+
+  .value-card__title {
+    font-size: 1.1rem;
+  }
+}
+
+// ===========================================
+// RESPONSIVE - Small Mobile (max-width: 480px)
+// ===========================================
+
+@media (max-width: 480px) {
+  .promise__title {
+    font-size: 1.5rem;
+  }
+
+  .promise__text {
+    font-size: 0.9rem;
+  }
+
+  .value-card {
+    padding: 1rem;
+    flex-direction: column;
+    text-align: center;
+    gap: 0.75rem;
+  }
+
+  .value-card__icon {
+    margin-bottom: 0;
+
+    svg {
+      width: 36px;
+      height: 36px;
+    }
+  }
+
+  .value-card__title {
+    font-size: 1rem;
+  }
+}

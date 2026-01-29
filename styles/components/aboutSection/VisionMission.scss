@@ -1,0 +1,284 @@
+// ===========================================
+// VISION & MISSION SECTION
+// ===========================================
+
+.vision-mission {
+  background: $gray-50;
+  position: relative;
+  padding: $spacing-4xl 0;
+
+  // Grid Layout
+  &__grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: $spacing-4xl;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  // Card
+  &__card {
+    background: $bg-primary;
+    border-radius: $radius-2xl;
+    padding: $spacing-2xl;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+    border: 1px solid $gray-200;
+    transition: all $transition-base;
+    position: relative;
+    overflow: hidden;
+    height: fit-content;
+
+    // Gradient top border
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 5px;
+      background: linear-gradient(135deg, $primary-color, $secondary-color);
+    }
+
+    &:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.12);
+      border-color: $primary-light;
+    }
+  }
+
+  // Card Header
+  &__header {
+    text-align: center;
+    margin-bottom: $spacing-2xl;
+  }
+
+  // Icon Circle
+  &__icon {
+    width: 70px;
+    height: 70px;
+    border-radius: $radius-full;
+    background: linear-gradient(135deg, $primary-color, $secondary-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto $spacing-lg;
+    box-shadow: 0 10px 25px rgba($primary-color, 0.3);
+
+    svg {
+      color: $gray-900;
+      filter: drop-shadow(0 2px 4px rgba(255, 255, 255, 0.3));
+    }
+  }
+
+  // Card Title
+  &__title {
+    font-size: $font-size-2xl;
+    font-weight: $font-weight-bold;
+    color: $gray-900;
+    margin-bottom: $spacing-sm;
+  }
+
+  // Card Subtitle
+  &__subtitle {
+    font-size: $font-size-base;
+    color: $gray-500;
+    margin-bottom: $spacing-md;
+  }
+
+  // List
+  &__list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  // List Item
+  &__item {
+    display: flex;
+    align-items: flex-start;
+    gap: $spacing-md;
+    margin-bottom: $spacing-lg;
+    padding: $spacing-lg;
+    background: $gray-50;
+    border-radius: $radius-xl;
+    border-left: 4px solid $primary-color;
+    transition: all $transition-fast;
+
+    &:hover {
+      background: $primary-light;
+      transform: translateX(8px);
+      border-left-color: $secondary-color;
+    }
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  // Item Icon
+  &__item-icon {
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    border-radius: $radius-full;
+    background: linear-gradient(135deg, $primary-color, $secondary-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: $gray-900;
+    box-shadow: 0 4px 12px rgba($primary-color, 0.3);
+
+    svg {
+      width: 20px;
+      height: 20px;
+    }
+  }
+
+  // Item Text
+  &__item-text {
+    font-size: $font-size-sm;
+    color: $gray-700;
+    line-height: 1.6;
+    font-weight: $font-weight-medium;
+    margin: 0;
+  }
+}
+
+// ===========================================
+// RESPONSIVE - Tablet (max-width: 1024px)
+// ===========================================
+
+@media (max-width: $breakpoint-lg) {
+  .vision-mission {
+    &__grid {
+      grid-template-columns: 1fr;
+      gap: $spacing-2xl;
+    }
+
+    &__card {
+      padding: $spacing-2xl;
+    }
+  }
+}
+
+// ===========================================
+// RESPONSIVE - Mobile (max-width: 768px)
+// ===========================================
+
+@media (max-width: $breakpoint-md) {
+  .vision-mission {
+    padding: $spacing-2xl 0;
+
+    &__grid {
+      gap: $spacing-xl;
+    }
+
+    &__card {
+      padding: $spacing-xl $spacing-lg;
+    }
+
+    &__icon {
+      width: 60px;
+      height: 60px;
+    }
+
+    &__title {
+      font-size: $font-size-xl;
+    }
+
+    &__item {
+      padding: $spacing-md;
+      margin-bottom: $spacing-md;
+    }
+
+    &__item-icon {
+      width: 35px;
+      height: 35px;
+
+      svg {
+        width: 18px;
+        height: 18px;
+      }
+    }
+  }
+}
+
+// ===========================================
+// RESPONSIVE - Small Mobile (max-width: 480px)
+// ===========================================
+
+@media (max-width: 480px) {
+  .vision-mission {
+    padding: $spacing-xl 0;
+
+    &__card {
+      padding: $spacing-lg $spacing-md;
+    }
+
+    &__header {
+      margin-bottom: $spacing-lg;
+    }
+
+    &__icon {
+      width: 50px;
+      height: 50px;
+      margin-bottom: $spacing-md;
+
+      svg {
+        width: 24px;
+        height: 24px;
+      }
+    }
+
+    &__title {
+      font-size: $font-size-lg;
+    }
+
+    &__subtitle {
+      font-size: $font-size-sm;
+    }
+
+    &__item {
+      padding: $spacing-sm;
+      gap: $spacing-sm;
+    }
+
+    &__item-icon {
+      width: 32px;
+      height: 32px;
+
+      svg {
+        width: 16px;
+        height: 16px;
+      }
+    }
+
+    &__item-text {
+      font-size: $font-size-xs;
+    }
+  }
+}
+
+// ===========================================
+// REDUCED MOTION
+// ===========================================
+
+@media (prefers-reduced-motion: reduce) {
+  .vision-mission {
+    &__card {
+      transition: none;
+
+      &:hover {
+        transform: none;
+      }
+    }
+
+    &__item {
+      transition: none;
+
+      &:hover {
+        transform: none;
+      }
+    }
+  }
+}
