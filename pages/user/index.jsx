@@ -27,7 +27,6 @@ const defaultProfile = {
   phoneNumber: '',
   emailAddress: '',
   emergencyContact: '',
-  address: '',
 };
 
 function User() {
@@ -35,7 +34,12 @@ function User() {
     if (typeof window === 'undefined') return defaultProfile;
     try {
       const stored = localStorage.getItem('userProfile');
-      return stored ? JSON.parse(stored) : defaultProfile;
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        const { address, ...rest } = parsed;
+        return { ...defaultProfile, ...rest };
+      }
+      return defaultProfile;
     } catch {
       return defaultProfile;
     }
@@ -45,7 +49,12 @@ function User() {
     if (typeof window === 'undefined') return defaultProfile;
     try {
       const stored = localStorage.getItem('userProfile');
-      return stored ? JSON.parse(stored) : defaultProfile;
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        const { address, ...rest } = parsed;
+        return { ...defaultProfile, ...rest };
+      }
+      return defaultProfile;
     } catch {
       return defaultProfile;
     }
@@ -112,8 +121,9 @@ function User() {
     if (!profile.phoneNumber.trim()) return setMessage({ type: 'error', text: 'Phone Number is required.' });
     if (!profile.emailAddress.trim() || !validateEmail(profile.emailAddress)) return setMessage({ type: 'error', text: 'Enter a valid Email Address.' });
     try {
-      localStorage.setItem('userProfile', JSON.stringify(profile));
-      setSavedProfile(profile);
+      const { address, ...cleanProfile } = profile;
+      localStorage.setItem('userProfile', JSON.stringify(cleanProfile));
+      setSavedProfile(cleanProfile);
       setMessage({ type: 'success', text: 'Profile saved successfully.' });
     } catch {
       setMessage({ type: 'error', text: 'Unable to save profile.' });
@@ -127,7 +137,7 @@ function User() {
     }
     setRecipients((prev) => ([
       ...prev,
-      { name: '', age: '', gender: '', preferredLanguage: '', weight: '', height: '' },
+      { name: '', age: '', gender: '', preferredLanguage: '', weight: '', height: '', address: '', medicalConditions: '', specialRequirements: '' },
     ]));
   };
 
@@ -293,19 +303,6 @@ function User() {
                         data-testid="input-emergency-contact"
                       />
                     </div>
-                    <div className="user-profile__form-group">
-                      <label htmlFor="address" className="user-profile__label">Address</label>
-                      <input
-                        id="address"
-                        name="address"
-                        type="text"
-                        className="user-profile__input"
-                        placeholder="Your home address"
-                        value={profile.address}
-                        onChange={handleProfileChange}
-                        data-testid="input-address"
-                      />
-                    </div>
                   </div>
 
                   {showSaveProfileButton && (
@@ -442,6 +439,45 @@ function User() {
                                 onChange={(e) => updateRecipient(index, 'height', e.target.value)}
                                 min="0"
                                 step="0.1"
+                              />
+                            </div>
+                          </div>
+
+                          <div className="user-profile__form-row user-profile__form-row--single">
+                            <div className="user-profile__form-group">
+                              <label className="user-profile__label">Address</label>
+                              <textarea
+                                className="user-profile__input"
+                                placeholder="Recipient's address"
+                                value={r.address || ''}
+                                onChange={(e) => updateRecipient(index, 'address', e.target.value)}
+                                rows={3}
+                                data-testid={`recipient-address-${index}`}
+                              />
+                            </div>
+                          </div>
+
+                          <div className="user-profile__form-row">
+                            <div className="user-profile__form-group">
+                              <label className="user-profile__label">Medical Conditions</label>
+                              <textarea
+                                className="user-profile__input"
+                                placeholder="Relevant medical conditions"
+                                value={r.medicalConditions || ''}
+                                onChange={(e) => updateRecipient(index, 'medicalConditions', e.target.value)}
+                                rows={3}
+                                data-testid={`recipient-medical-${index}`}
+                              />
+                            </div>
+                            <div className="user-profile__form-group">
+                              <label className="user-profile__label">Special Requirements</label>
+                              <textarea
+                                className="user-profile__input"
+                                placeholder="Accessibility or care requirements"
+                                value={r.specialRequirements || ''}
+                                onChange={(e) => updateRecipient(index, 'specialRequirements', e.target.value)}
+                                rows={3}
+                                data-testid={`recipient-requirements-${index}`}
                               />
                             </div>
                           </div>
