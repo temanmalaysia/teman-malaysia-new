@@ -145,16 +145,17 @@ export default function Header({ isSignedIn = false, user = null, onLogout }) {
               {dropdownMenu}
             </div>
           ) : (
-            <button
-              type="button"
-              className="nav__signin-btn"
-              onClick={() => setIsSignInOpen(true)}
-              aria-haspopup="dialog"
-              aria-controls="signin-modal"
-              data-testid="nav-signin-btn"
-            >
-              <span>Sign In</span>
-            </button>
+            // <button
+            //   type="button"
+            //   className="nav__signin-btn"
+            //   onClick={() => setIsSignInOpen(true)}
+            //   aria-haspopup="dialog"
+            //   aria-controls="signin-modal"
+            //   data-testid="nav-signin-btn"
+            // >
+            //   <span>Sign In</span>
+            // </button>
+            ""
           )}
           <div
             className="nav__toggle"

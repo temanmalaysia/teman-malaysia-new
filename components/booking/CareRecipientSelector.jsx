@@ -4,6 +4,7 @@
  * If user has 3 saved recipients, they can only select (no manual entry)
  */
 
+import Link from 'next/link';
 import { useState } from 'react';
 import { FaUser, FaUserPlus, FaInfoCircle } from 'react-icons/fa';
 
@@ -115,7 +116,7 @@ export default function CareRecipientSelector({
   return (
     <div className={`care-recipient-selector ${themeClass}`}>
       {/* Mode Selection - Only show if user has saved recipients but not max */}
-      {hasSavedRecipients && !hasMaxRecipients && (
+      {/* {hasSavedRecipients && !hasMaxRecipients && (
         <div className="care-recipient-selector__mode-toggle">
           <button
             type="button"
@@ -134,7 +135,7 @@ export default function CareRecipientSelector({
             <span>Enter manually</span>
           </button>
         </div>
-      )}
+      )} */}
 
       {/* Info message when max recipients reached */}
       {hasMaxRecipients && (
@@ -143,7 +144,7 @@ export default function CareRecipientSelector({
           <span>
             You have reached the maximum of {MAX_RECIPIENTS} saved care recipients. 
             Please select from your saved list below, or manage your recipients in your 
-            <a href="/user"> Profile Settings</a>.
+            <Link href="/user"> Profile Settings</Link>.
           </span>
         </div>
       )}
@@ -291,14 +292,14 @@ export default function CareRecipientSelector({
       </div>
 
       {/* No saved recipients message */}
-      {!hasSavedRecipients && (
+      {/* {!hasSavedRecipients && (
         <div className="care-recipient-selector__empty">
           <p>
             <strong>Tip:</strong> Save care recipients in your{' '}
-            <a href="/user">Profile Settings</a> for faster booking next time.
+            <Link href="/user">Profile Settings</Link> for faster booking next time.
           </p>
         </div>
-      )}
+      )} */}
     </div>
   );
 }
