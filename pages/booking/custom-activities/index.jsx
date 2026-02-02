@@ -28,6 +28,7 @@ export default function CustomActivities() {
       <main className="home">
         <BookingHero {...BookingHeroData.customActivities} />
         <section className="booking-form-section">
+        <div className="container">
         <div className="booking-form-container">
           <ProgressSteps currentStep={currentStep} theme="customActivities" />
           {currentStep === 1 && (
@@ -63,6 +64,7 @@ export default function CustomActivities() {
               onBack={handleBack}
             />
           )}
+        </div>
         </div>
         </section>
       </main>

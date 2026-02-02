@@ -30,6 +30,7 @@ export default function HomePackage() {
       <main className="home">
         <BookingHero {...BookingHeroData.homePackage} />
         <section className="booking-form-section">
+        <div className="container">
         <div className="booking-form-container">
           <ProgressSteps currentStep={currentStep} theme="homePackage" />
           {currentStep === 1 && (
@@ -64,6 +65,7 @@ export default function HomePackage() {
               onBack={handleBack}
             />
           )}
+        </div>
         </div>
         </section>
       </main>

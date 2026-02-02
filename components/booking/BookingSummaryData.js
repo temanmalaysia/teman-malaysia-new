@@ -21,11 +21,11 @@ export const bookingSummaryData = {
         fields: [
           { key: 'serviceName', label: 'Service:', type: 'static' },
           { key: 'package', label: 'Package:', type: 'package' },
-          { key: 'appointment_date', label: 'Appointment Dates:', format: 'date' },
+          { key: 'appointment_dates', label: 'Appointment Dates:', format: 'date' },
           { key: 'appointment_type', label: 'Appointment Type:', format: 'capitalize' },
           { key: 'appointment_time', label: 'Appointment Time:' },
           { key: 'doctor_name', label: 'Doctor/Specialist:', default: 'Not specified' },
-          { key: 'facility_name', label: 'Medical Facility:' },
+          { key: 'facility_address', label: 'Medical Facility:' },
           { key: 'transportation_mode', label: 'Transportation:', format: 'transportation' },
         ],
         costField: {
@@ -57,7 +57,7 @@ export const bookingSummaryData = {
           { key: 'patient_name', label: 'Name:', default: 'Same as contact person' },
           { key: 'patient_age', label: 'Age:', default: 'Not specified' },
           { key: 'patient_gender', label: 'Gender:', format: 'capitalize' },
-          { key: 'preferred_language', label: 'Preferred Language:', default: 'English' },
+          { key: 'patient_language', label: 'Preferred Language:', default: 'English' },
           { key: 'patient_weight', label: 'Weight:', default: 'Not specified' },
           { key: 'patient_height', label: 'Height:', default: 'Not specified' },
         ],
@@ -79,8 +79,8 @@ export const bookingSummaryData = {
         icon: 'medical',
         fields: [
           { key: 'medical_conditions', label: 'Medical Conditions:' },
-          { key: 'current_medications', label: 'Current Medications:', default: 'None specified' },
-          { key: 'mobility_status', label: 'Mobility Assistance:', format: 'capitalize', default: 'None' },
+          { key: 'medications', label: 'Current Medications:', default: 'None specified' },
+          { key: 'mobility_assistance', label: 'Mobility Assistance:', format: 'capitalize', default: 'None' },
           { key: 'special_requirements', label: 'Special Requirements:' },
         ],
       },
@@ -89,8 +89,8 @@ export const bookingSummaryData = {
         title: 'Companion Preferences',
         icon: 'users',
         fields: [
-          { key: 'companion_gender', label: 'Preferred Gender:', format: 'capitalize', default: 'No Preference' },
-          { key: 'companion_language', label: 'Language Preference:', format: 'capitalize', default: 'English' },
+          { key: 'preferred_gender', label: 'Preferred Gender:', format: 'capitalize', default: 'No Preference' },
+          { key: 'preferred_language', label: 'Language Preference:', format: 'capitalize', default: 'English' },
           { key: 'additional_notes', label: 'Additional Notes:', default: 'None' },
           { key: 'how_heard', label: 'How did you hear about us:', format: 'capitalize' },
         ],
@@ -150,7 +150,7 @@ export const bookingSummaryData = {
           { key: 'email', label: 'Email:' },
           { key: 'emergency_contact', label: 'Emergency Contact:' },
           { key: 'relationship', label: 'Relationship:' },
-          { key: 'employer', label: 'Employer:' },
+        { key: 'employer_name', label: 'Employer:' },
         ],
       },
       {
@@ -171,7 +171,7 @@ export const bookingSummaryData = {
         title: 'Location Details',
         icon: 'location',
         fields: [
-          { key: 'dialysis_center', label: 'Dialysis Center:' },
+        { key: 'center_address', label: 'Dialysis Center:' },
           { key: 'pickup_address', label: 'Pickup Address:' },
           { key: 'return_address', label: 'Return Address:', default: 'Same as pickup address' },
           { key: 'pickup_time', label: 'Preferred Pickup Time:' },
@@ -183,9 +183,9 @@ export const bookingSummaryData = {
         icon: 'medical',
         fields: [
           { key: 'medical_conditions', label: 'Medical Conditions:' },
-          { key: 'current_medications', label: 'Medications:', default: 'None specified' },
-          { key: 'dietary_restrictions', label: 'Dietary Restrictions:' },
-          { key: 'mobility_status', label: 'Mobility Assistance:', default: 'none' },
+        { key: 'medications', label: 'Medications:', default: 'None specified' },
+        { key: 'restrictions', label: 'Dietary Restrictions:' },
+        { key: 'mobility_assistance', label: 'Mobility Assistance:', default: 'none' },
           { key: 'special_requirements', label: 'Special Requirements:' },
         ],
       },
@@ -194,8 +194,8 @@ export const bookingSummaryData = {
         title: 'Companion Preferences',
         icon: 'users',
         fields: [
-          { key: 'companion_gender', label: 'Preferred Gender:', default: 'no-preference' },
-          { key: 'companion_language', label: 'Language Preference:', default: 'english' },
+        { key: 'preferred_gender', label: 'Preferred Gender:', default: 'no-preference' },
+        { key: 'preferred_language', label: 'Language Preference:', default: 'english' },
         ],
       },
       {
@@ -256,7 +256,7 @@ export const bookingSummaryData = {
         fields: [
           { key: 'planned_activities', label: 'Activities:' },
           { key: 'activity_pace', label: 'Activity Pace:', default: 'Not specified' },
-          { key: 'meeting_point', label: 'Meeting Point:' },
+        { key: 'pickup_address', label: 'Meeting Point:' },
           { key: 'activity_location', label: 'Activity Locations:' },
         ],
       },
@@ -280,9 +280,9 @@ export const bookingSummaryData = {
         fields: [
           { key: 'patient_name', label: 'Name:', default: 'Not specified' },
           { key: 'age_gender', label: 'Age & Gender:', type: 'ageGender', default: 'Not specified' },
-          { key: 'preferred_language', label: 'Language:', default: 'English' },
-          { key: 'health_notes', label: 'Health Notes:', default: 'None specified' },
-          { key: 'mobility_status', label: 'Mobility Assistance:', default: 'None' },
+        { key: 'patient_language', label: 'Language:', default: 'English' },
+        { key: 'health_notes', label: 'Health Notes:', default: 'None specified' },
+        { key: 'mobility_assistance', label: 'Mobility Assistance:', default: 'None' },
         ],
       },
       {
@@ -338,9 +338,9 @@ export const bookingSummaryData = {
           { key: 'serviceName', label: 'Service:', type: 'static' },
           { key: 'package', label: 'Package:', type: 'homePackageLabel' },
           { key: 'care_services', label: 'Care Services:', type: 'careServices' },
-          { key: 'selected_dates', label: 'Selected Dates:', type: 'dateList' },
+          { key: 'care_dates', label: 'Selected Dates:', type: 'dateList' },
           { key: 'schedule', label: 'Schedule:', type: 'timeRange' },
-          { key: 'care_start_date', label: 'Start Date:', format: 'dateFull' },
+          { key: 'service_start_date', label: 'Start Date:', format: 'dateFull' },
           { key: 'transportation_mode', label: 'Transportation:', format: 'transportation' },
         ],
         costField: {
@@ -369,9 +369,9 @@ export const bookingSummaryData = {
         fields: [
           { key: 'patient_name', label: 'Name:' },
           { key: 'age_gender', label: 'Age & Gender:', type: 'ageGender' },
-          { key: 'preferred_language', label: 'Language:', default: 'English' },
+          { key: 'patient_language', label: 'Language:', default: 'English' },
           { key: 'medical_conditions', label: 'Medical Conditions:' },
-          { key: 'mobility_status', label: 'Mobility Level:', default: 'Fully mobile' },
+          { key: 'mobility_assistance', label: 'Mobility Level:', default: 'Fully mobile' },
           { key: 'allergies', label: 'Allergies:' },
         ],
       },
@@ -380,8 +380,8 @@ export const bookingSummaryData = {
         title: 'Companion Preferences',
         icon: 'users',
         fields: [
-          { key: 'companion_gender', label: 'Preferred Gender:', default: 'No preference' },
-          { key: 'companion_language', label: 'Language Preference:', default: 'English' },
+          { key: 'preferred_gender', label: 'Preferred Gender:', default: 'No preference' },
+          { key: 'preferred_language', label: 'Language Preference:', default: 'English' },
           { key: 'companion_age', label: 'Age Preference:' },
           { key: 'personality_traits', label: 'Personality Traits:' },
           { key: 'additional_notes', label: 'Additional Notes:', default: 'None' },
@@ -454,7 +454,9 @@ export const careServicesLabels = {
 export const transportationLabels = {
   'client-provided': 'I will provide transportation',
   'teman-provided': 'Temanion will arrange transportation',
+  'temanion-arranged': 'Temanion will arrange transportation',
   'e-hailing': 'E-Hailing Service (Grab/Taxi)',
+  'ehailing': 'E-Hailing Service (Grab/Taxi)',
 };
 
 // ===========================================

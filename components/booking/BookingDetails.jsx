@@ -17,6 +17,7 @@ import MultiDatePicker from './MultiDatePicker';
 import CareRecipientSelector from './CareRecipientSelector';
 import { FaCar, FaHeartbeat, FaUser, FaCalendarAlt, FaBookMedical, FaPlusSquare, FaStar, FaHome, FaExclamationTriangle, FaArrowLeft, FaArrowRight } from 'react-icons/fa';
 import {FaListCheck, FaLocationDot, FaUserGroup} from 'react-icons/fa6';
+import dayjs from 'dayjs';
 
 export default function BookingDetails({
   theme = 'health',
@@ -33,8 +34,34 @@ export default function BookingDetails({
   // Handle input change
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    const newValue = type === 'checkbox' ? checked : value;
-    
+    let newValue = type === 'checkbox' ? checked : value;
+
+    if (type === 'date') {
+      const advanceNames = new Set(['appointment_dates', 'service_start_date']);
+      if (advanceNames.has(name)) {
+        const minDate = dayjs().startOf('day').add(5, 'day');
+        const parsed = dayjs(newValue);
+        if (parsed.isValid()) {
+          newValue = parsed.isBefore(minDate) ? minDate.format('YYYY-MM-DD') : parsed.format('YYYY-MM-DD');
+        } else {
+          newValue = '';
+        }
+      }
+
+      if (name === 'service_end_date') {
+        const start = formData.service_start_date ? dayjs(formData.service_start_date) : dayjs().startOf('day').add(5, 'day');
+        const max = start.add(90, 'day');
+        const parsed = dayjs(newValue);
+        if (parsed.isValid()) {
+          if (parsed.isBefore(start)) newValue = start.format('YYYY-MM-DD');
+          else if (parsed.isAfter(max)) newValue = max.format('YYYY-MM-DD');
+          else newValue = parsed.format('YYYY-MM-DD');
+        } else {
+          newValue = '';
+        }
+      }
+    }
+
     onFormChange({
       ...formData,
       [name]: newValue,
@@ -201,12 +228,7 @@ export default function BookingDetails({
           const minAdvanceDays = 5;
           let minStr = undefined;
           if (field.type === 'date') {
-            const d = new Date();
-            d.setDate(d.getDate() + minAdvanceDays);
-            const y = d.getFullYear();
-            const m = String(d.getMonth() + 1).padStart(2, '0');
-            const day = String(d.getDate()).padStart(2, '0');
-            minStr = `${y}-${m}-${day}`;
+            minStr = dayjs().add(minAdvanceDays, 'day').format('YYYY-MM-DD');
           }
           return (
             <input
@@ -525,21 +547,14 @@ export default function BookingDetails({
                   let maxDate = undefined;
                   
                   if (field.name === 'service_start_date') {
-                    const today = new Date();
-                    const minStartDate = new Date(today);
-                    minStartDate.setDate(minStartDate.getDate() + 5);
-                    minDate = minStartDate.toISOString().split('T')[0];
+                    minDate = dayjs().add(5, 'day').format('YYYY-MM-DD');
                   }
                   
                   // Calculate min/max date for service_end_date
                   if (field.name === 'service_end_date' && formData.service_start_date) {
-                    const startDate = new Date(formData.service_start_date);
-                    // Min: Service Start Date
-                    minDate = formData.service_start_date;
-                    // Max: 90 days from Service Start Date
-                    const maxEndDate = new Date(startDate);
-                    maxEndDate.setDate(maxEndDate.getDate() + 90);
-                    maxDate = maxEndDate.toISOString().split('T')[0];
+                    const startDate = dayjs(formData.service_start_date);
+                    minDate = startDate.format('YYYY-MM-DD');
+                    maxDate = startDate.add(90, 'day').format('YYYY-MM-DD');
                   }
                   
                   return (

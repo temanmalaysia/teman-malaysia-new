@@ -31,6 +31,8 @@
 // Form container fills the container width
 .booking-form-container {
   width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
   background: $bg-primary;
   border-radius: $radius-2xl;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);

@@ -28,6 +28,7 @@ export default function HealthAppointments() {
       <main className="home">
         <BookingHero {...BookingHeroData.health} />
         <section className="booking-form-section">
+        <div className="container">
         <div className="booking-form-container">
           <ProgressSteps currentStep={currentStep} theme="health" />
           {currentStep === 1 && (
@@ -66,6 +67,7 @@ export default function HealthAppointments() {
               onBack={handleBack}
             />
           )}
+        </div>
         </div>
         </section>
       </main>
