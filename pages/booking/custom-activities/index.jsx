@@ -9,6 +9,7 @@ import PackageSelection from "@/components/booking/PackageSelection";
 import ProgressSteps from "@/components/booking/ProgressSteps";
 import MainLayout from "@/components/layout/MainLayout";
 import useBookingForm from "@/hooks/useBookingForm";
+import apiClient from "@/api/apiClient";
 
 export default function CustomActivities() {
   const {
@@ -28,44 +29,63 @@ export default function CustomActivities() {
       <main className="home">
         <BookingHero {...BookingHeroData.customActivities} />
         <section className="booking-form-section">
-        <div className="container">
-        <div className="booking-form-container">
-          <ProgressSteps currentStep={currentStep} theme="customActivities" />
-          {currentStep === 1 && (
-            <PackageSelection
-              theme="customActivities"
-              {...packageData.customActivities}
-              selectedPackage={selectedPackage}
-              onPackageChange={setSelectedPackage}
-              selectedHours={selectedHours}
-              onHoursChange={setSelectedHours}
-              onContinue={handleContinue}
-            />
-          )}
-          {currentStep === 2 && (
-            <BookingDetails
-              theme="customActivities"
-              {...BookingDetailsData.customActivities}
-              formData={formData}
-              onFormChange={setFormData}
-              selectedHours={selectedHours}
-              onContinue={handleContinue}
-              onBack={handleBack}
-            />
-          )}
-          {currentStep === 3 && (
-            <BookingSummary
-              theme="customActivities"
-              title={bookingSummaryData.customActivities.title}
-              sections={bookingSummaryData.customActivities.sections}
-              formData={formData}
-              selectedPackage={selectedPackage}
-              selectedHours={selectedHours}
-              onBack={handleBack}
-            />
-          )}
-        </div>
-        </div>
+          <div className="container">
+            <div className="booking-form-container">
+              <ProgressSteps
+                currentStep={currentStep}
+                theme="customActivities"
+              />
+              {currentStep === 1 && (
+                <PackageSelection
+                  theme="customActivities"
+                  {...packageData.customActivities}
+                  selectedPackage={selectedPackage}
+                  onPackageChange={setSelectedPackage}
+                  selectedHours={selectedHours}
+                  onHoursChange={setSelectedHours}
+                  onContinue={handleContinue}
+                />
+              )}
+              {currentStep === 2 && (
+                <BookingDetails
+                  theme="customActivities"
+                  {...BookingDetailsData.customActivities}
+                  formData={formData}
+                  onFormChange={setFormData}
+                  selectedHours={selectedHours}
+                  onContinue={handleContinue}
+                  onBack={handleBack}
+                />
+              )}
+              {currentStep === 3 && (
+                <BookingSummary
+                  theme="customActivities"
+                  title={bookingSummaryData.customActivities.title}
+                  sections={bookingSummaryData.customActivities.sections}
+                  formData={formData}
+                  selectedPackage={selectedPackage}
+                  selectedHours={selectedHours}
+                  onBack={handleBack}
+                  onSubmit={async (payload) => {
+                    try {
+                      const result = await apiClient.booking.submit(
+                        payload,
+                        "customActivities",
+                        {
+                          sendEmail: true,
+                          redirectToPayment: false,
+                        },
+                      );
+                      return result;
+                    } catch (error) {
+                      console.error("Booking failed:", error);
+                      throw error;
+                    }
+                  }}
+                />
+              )}
+            </div>
+          </div>
         </section>
       </main>
     </MainLayout>

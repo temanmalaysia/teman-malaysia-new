@@ -1,24 +1,25 @@
-import { useState } from 'react';
-import { 
-  FaHeartbeat, 
-  FaCalendarCheck, 
-  FaLightbulb, 
-  FaStar, 
-  FaClipboardList, 
-  FaUser, 
-  FaBookMedical, 
-  FaInfoCircle, 
-  FaPlusSquare, 
-  FaCreditCard, 
-  FaPhoneAlt, 
-  FaUserCheck, 
-  FaHeart, 
-  FaHome, 
-  FaExclamationTriangle, 
-  FaArrowLeft, 
-  FaCalendar 
-} from 'react-icons/fa';
-import { FaLocationDot, FaUserGroup } from 'react-icons/fa6';
+import { useState } from "react";
+import dayjs from "dayjs";
+import {
+  FaHeartbeat,
+  FaCalendarCheck,
+  FaLightbulb,
+  FaStar,
+  FaClipboardList,
+  FaUser,
+  FaBookMedical,
+  FaInfoCircle,
+  FaPlusSquare,
+  FaCreditCard,
+  FaPhoneAlt,
+  FaUserCheck,
+  FaHeart,
+  FaHome,
+  FaExclamationTriangle,
+  FaArrowLeft,
+  FaCalendar,
+} from "react-icons/fa";
+import { FaLocationDot, FaUserGroup } from "react-icons/fa6";
 import {
   bookingSummaryData,
   packagePricing,
@@ -27,8 +28,8 @@ import {
   activityPaceLabels,
   activityDurationLabels,
   daysOfWeekLabels,
-} from './BookingSummaryData';
-import SuccessModal from '../modal/SuccessModal';
+} from "./BookingSummaryData";
+import SuccessModal from "../modal/SuccessModal";
 
 // ===========================================
 // ICONS
@@ -40,14 +41,14 @@ const icons = {
   heart: <FaHeart size={20} />,
   heartbeat: <FaHeartbeat size={20} />,
   calendar: <FaCalendar size={20} />,
-  'calendar-check': <FaCalendarCheck size={20} />,
+  "calendar-check": <FaCalendarCheck size={20} />,
   location: <FaLocationDot size={20} />,
   medical: <FaBookMedical size={20} />,
   plus: <FaPlusSquare size={20} />,
   info: <FaInfoCircle size={20} />,
-  'credit-card': <FaCreditCard size={20} />,
+  "credit-card": <FaCreditCard size={20} />,
   phone: <FaPhoneAlt size={20} />,
-  'user-check': <FaUserCheck size={20} />,
+  "user-check": <FaUserCheck size={20} />,
   home: <FaHome size={20} />,
   star: <FaStar size={20} />,
   lightbulb: <FaLightbulb size={20} />,
@@ -59,19 +60,19 @@ const icons = {
 // BOOKING SUMMARY COMPONENT
 // ===========================================
 export default function BookingSummary({
-  theme = 'health',
+  theme = "health",
   formData = {},
-  selectedPackage = '',
-  selectedHours = '',
+  selectedPackage = "",
+  selectedHours = "",
   addonSelected = false,
-  addonHours = '',
+  addonHours = "",
   onBack,
   onSubmit,
 }) {
   const [termsAgreed, setTermsAgreed] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
-  const [bookingRef, setBookingRef] = useState('');
+  const [bookingRef, setBookingRef] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Get config for current theme
   const config = bookingSummaryData[theme];
@@ -88,20 +89,20 @@ export default function BookingSummary({
     const hours = parseInt(selectedHours || 0);
 
     switch (theme) {
-      case 'health':
-        if (selectedPackage === 'hourly') {
+      case "health":
+        if (selectedPackage === "hourly") {
           cost = hours * 35;
-        } else if (selectedPackage === '4hours') {
+        } else if (selectedPackage === "4hours") {
           cost = 132;
-        } else if (selectedPackage === '6hours') {
+        } else if (selectedPackage === "6hours") {
           cost = 186;
         }
         break;
 
-      case 'dialysis':
-        if (selectedPackage === 'hourly') {
+      case "dialysis":
+        if (selectedPackage === "hourly") {
           cost = hours * 35;
-        } else if (selectedPackage === '3sessions') {
+        } else if (selectedPackage === "3sessions") {
           cost = 186;
         }
         if (addonSelected && addonHours) {
@@ -109,18 +110,18 @@ export default function BookingSummary({
         }
         break;
 
-      case 'customActivities':
-        if (selectedPackage === 'hourly') {
+      case "customActivities":
+        if (selectedPackage === "hourly") {
           cost = hours * 35;
         }
         break;
 
-      case 'homePackage':
-        if (selectedPackage === 'package1') {
+      case "homePackage":
+        if (selectedPackage === "package1") {
           cost = 2800;
-        } else if (selectedPackage === 'package2') {
+        } else if (selectedPackage === "package2") {
           cost = 3780;
-        } else if (selectedPackage === 'package3') {
+        } else if (selectedPackage === "package3") {
           cost = 4720;
         }
         break;
@@ -136,47 +137,43 @@ export default function BookingSummary({
   // FORMAT HELPERS
   // ===========================================
   const formatText = (text, format) => {
-    if (text === null || text === undefined || text === '') return null;
+    if (text === null || text === undefined || text === "") return null;
 
     switch (format) {
-      case 'capitalize':
-        return text.toString().replace(/-/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase());
-      case 'date':
+      case "capitalize":
+        return text
+          .toString()
+          .replace(/-/g, " ")
+          .replace(/\b\w/g, (l) => l.toUpperCase());
+      case "date":
         if (!text) return null;
         try {
-          return new Date(text).toLocaleDateString('en-MY', {
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit',
-          }).split('/').reverse().join('-');
+          const d = dayjs(text);
+          return d.isValid() ? d.format("DD/MM/YYYY") : text;
         } catch {
           return text;
         }
-      case 'dateFull':
+      case "dateFull":
         if (!text) return null;
         try {
-          return new Date(text).toLocaleDateString('en-MY', {
-            weekday: 'long',
-            day: 'numeric',
-            month: 'long',
-            year: 'numeric',
-          });
+          const d = dayjs(text);
+          return d.isValid() ? d.format("dddd, D MMMM YYYY") : text;
         } catch {
           return text;
         }
-      case 'time':
+      case "time":
         return text;
-      case 'hours':
+      case "hours":
         return text ? `${text} hours` : null;
-      case 'yesno':
-        if (text === true || text === 'yes' || text === 'Yes') return 'Yes';
-        if (text === false || text === 'no' || text === 'No') return 'No';
+      case "yesno":
+        if (text === true || text === "yes" || text === "Yes") return "Yes";
+        if (text === false || text === "no" || text === "No") return "No";
         return null;
-      case 'transportation':
+      case "transportation":
         return transportationLabels[text] || text;
-      case 'activityPace':
+      case "activityPace":
         return activityPaceLabels[text] || text;
-      case 'activityDuration':
+      case "activityDuration":
         return activityDurationLabels[text] || text;
       default:
         return text;
@@ -184,40 +181,46 @@ export default function BookingSummary({
   };
 
   const getPackageLabel = () => {
-    if (!selectedPackage) return '-';
+    if (!selectedPackage) return "-";
 
     switch (theme) {
-      case 'health':
-        if (selectedPackage === 'hourly') {
-          return selectedHours ? `Hourly Rate - ${selectedHours} hours` : 'Hourly Rate';
-        } else if (selectedPackage === '4hours') {
-          return '4 Hours';
-        } else if (selectedPackage === '6hours') {
-          return '6 Hours';
+      case "health":
+        if (selectedPackage === "hourly") {
+          return selectedHours
+            ? `Hourly Rate - ${selectedHours} hours`
+            : "Hourly Rate";
+        } else if (selectedPackage === "4hours") {
+          return "4 Hours";
+        } else if (selectedPackage === "6hours") {
+          return "6 Hours";
         }
         break;
 
-      case 'dialysis':
-        if (selectedPackage === 'hourly') {
-          return selectedHours ? `Hourly Rate - ${selectedHours} hours` : 'Hourly Rate';
-        } else if (selectedPackage === '3sessions') {
-          return 'Multi-session Package: 3 x 2 hour Sessions';
+      case "dialysis":
+        if (selectedPackage === "hourly") {
+          return selectedHours
+            ? `Hourly Rate - ${selectedHours} hours`
+            : "Hourly Rate";
+        } else if (selectedPackage === "3sessions") {
+          return "Multi-session Package: 3 x 2 hour Sessions";
         }
         break;
 
-      case 'customActivities':
-        if (selectedPackage === 'hourly') {
-          return selectedHours ? `Hourly Rate - ${selectedHours} hours` : 'Hourly Rate';
+      case "customActivities":
+        if (selectedPackage === "hourly") {
+          return selectedHours
+            ? `Hourly Rate - ${selectedHours} hours`
+            : "Hourly Rate";
         }
         break;
 
-      case 'homePackage':
-        if (selectedPackage === 'package1') {
-          return 'Package 1: 20 × 4 hour sessions';
-        } else if (selectedPackage === 'package2') {
-          return 'Package 2: 20 × 6 hour sessions';
-        } else if (selectedPackage === 'package3') {
-          return 'Package 3: 20 × 8 hour sessions';
+      case "homePackage":
+        if (selectedPackage === "package1") {
+          return "Package 1: 20 × 4 hour sessions";
+        } else if (selectedPackage === "package2") {
+          return "Package 2: 20 × 6 hour sessions";
+        } else if (selectedPackage === "package3") {
+          return "Package 3: 20 × 8 hour sessions";
         }
         break;
 
@@ -229,16 +232,18 @@ export default function BookingSummary({
   };
 
   const getPackageLabelWithPrice = () => {
-    if (!selectedPackage) return '-';
-    
+    if (!selectedPackage) return "-";
+
     const cost = calculateCost();
     const hours = parseInt(selectedHours || 0);
 
     switch (theme) {
-      case 'dialysis':
-        if (selectedPackage === 'hourly') {
-          return hours ? `Single Session (${hours} hours total) - RM${cost}` : 'Single Session';
-        } else if (selectedPackage === '3sessions') {
+      case "dialysis":
+        if (selectedPackage === "hourly") {
+          return hours
+            ? `Single Session (${hours} hours total) - RM${cost}`
+            : "Single Session";
+        } else if (selectedPackage === "3sessions") {
           return `3-Session Package (6 hours total) - RM${cost}`;
         }
         break;
@@ -251,73 +256,77 @@ export default function BookingSummary({
   };
 
   const getHomePackageLabel = () => {
-    if (!selectedPackage) return '-';
+    if (!selectedPackage) return "-";
 
     switch (selectedPackage) {
-      case 'package1':
-        return 'Package 1 - 4 hours/day, 20 sessions';
-      case 'package2':
-        return 'Package 2 - 6 hours/day, 20 sessions';
-      case 'package3':
-        return 'Package 3 - 8 hours/day, 20 sessions';
+      case "package1":
+        return "Package 1 - 4 hours/day, 20 sessions";
+      case "package2":
+        return "Package 2 - 6 hours/day, 20 sessions";
+      case "package3":
+        return "Package 3 - 8 hours/day, 20 sessions";
       default:
         return selectedPackage;
     }
   };
 
   const getAddonLabel = () => {
-    if (!addonSelected || !addonHours) return 'None';
+    if (!addonSelected || !addonHours) return "None";
     const addonCost = parseInt(addonHours) * (pricing?.addon?.rate || 30);
     return `${addonHours} hours (+RM${addonCost})`;
   };
 
   const getCareServicesLabel = () => {
     const services = formData.care_services;
-    if (!services || (Array.isArray(services) && services.length === 0)) return '-';
+    if (!services || (Array.isArray(services) && services.length === 0))
+      return "-";
 
     if (Array.isArray(services)) {
-      return services.map((service) => careServicesLabels[service] || service).join(', ');
+      return services
+        .map((service) => careServicesLabels[service] || service)
+        .join(", ");
     }
-    
+
     return services;
   };
 
   const getDateListLabel = (dates) => {
-    if (!dates || (Array.isArray(dates) && dates.length === 0)) return '-';
+    if (!dates || (Array.isArray(dates) && dates.length === 0)) return "-";
     if (Array.isArray(dates)) {
       return dates
         .map((d) => {
           try {
-            return new Date(d).toLocaleDateString('en-MY', {
-              year: 'numeric',
-              month: '2-digit',
-              day: '2-digit',
-            }).split('/').reverse().join('-');
+            const dd = dayjs(d);
+            return dd.isValid() ? dd.format("DD/MM/YYYY") : d;
           } catch {
             return d;
           }
         })
-        .join(', ');
+        .join(", ");
     }
     return dates;
   };
 
   const getDaysListLabel = (days) => {
-    if (!days || (Array.isArray(days) && days.length === 0)) return '-';
+    if (!days || (Array.isArray(days) && days.length === 0)) return "-";
     if (Array.isArray(days)) {
-      return days.map((d) => daysOfWeekLabels[d] || d).join(', ');
+      return days.map((d) => daysOfWeekLabels[d] || d).join(", ");
     }
     return days;
   };
 
   const getTimeRangeLabel = () => {
-    const startTime = formData.care_start_time || formData.schedule_start || formData.start_time;
-    const endTime = formData.care_end_time || formData.schedule_end || formData.end_time;
-    
-    if (!startTime && !endTime) return '-';
+    const startTime =
+      formData.care_start_time ||
+      formData.schedule_start ||
+      formData.start_time;
+    const endTime =
+      formData.care_end_time || formData.schedule_end || formData.end_time;
+
+    if (!startTime && !endTime) return "-";
     if (startTime && endTime) return `${startTime} - ${endTime}`;
     if (startTime) return startTime;
-    return '-';
+    return "-";
   };
 
   // ===========================================
@@ -327,30 +336,30 @@ export default function BookingSummary({
     const { key, type, format, default: defaultValue } = field;
 
     switch (type) {
-      case 'static':
+      case "static":
         return config.serviceName;
-      case 'package':
+      case "package":
         return getPackageLabel();
-      case 'packageWithPrice':
+      case "packageWithPrice":
         return getPackageLabelWithPrice();
-      case 'homePackageLabel':
+      case "homePackageLabel":
         return getHomePackageLabel();
-      case 'cost':
+      case "cost":
         const cost = calculateCost();
-        return cost > 0 ? `RM ${cost.toLocaleString()}` : '-';
-      case 'addon':
+        return cost > 0 ? `RM ${cost.toLocaleString()}` : "-";
+      case "addon":
         return getAddonLabel();
-      case 'careServices':
+      case "careServices":
         return getCareServicesLabel();
-      case 'dateList':
+      case "dateList":
         return getDateListLabel(formData[key]);
-      case 'daysList':
+      case "daysList":
         return getDaysListLabel(formData[key]);
-      case 'timeRange':
+      case "timeRange":
         return getTimeRangeLabel();
-      case 'duration':
-        return selectedHours ? `${selectedHours} hours` : '-';
-      case 'ageGender':
+      case "duration":
+        return selectedHours ? `${selectedHours} hours` : "-";
+      case "ageGender":
         const age = formData.patient_age;
         const gender = formData.patient_gender;
         if (age && gender) {
@@ -360,21 +369,25 @@ export default function BookingSummary({
         } else if (gender) {
           return gender;
         }
-        return defaultValue || '-';
+        return defaultValue || "-";
       default:
         break;
     }
 
     const value = formData[key];
-    
-    if (value === null || value === undefined || value === '') {
-      return defaultValue || '-';
+
+    if (value === null || value === undefined || value === "") {
+      return defaultValue || "-";
     }
 
     const formattedValue = formatText(value, format);
-    
-    if (formattedValue === null || formattedValue === undefined || formattedValue === '') {
-      return defaultValue || '-';
+
+    if (
+      formattedValue === null ||
+      formattedValue === undefined ||
+      formattedValue === ""
+    ) {
+      return defaultValue || "-";
     }
 
     return formattedValue;
@@ -385,37 +398,39 @@ export default function BookingSummary({
   // ===========================================
   const handleSubmit = async () => {
     if (!termsAgreed) {
-      alert('Please agree to the Terms & Conditions and Privacy Policy to continue.');
+      alert(
+        "Please agree to the Terms & Conditions and Privacy Policy to continue.",
+      );
       return;
     }
 
     setIsSubmitting(true);
 
     try {
-      const ref = 'TM' + Date.now().toString().slice(-6);
-      setBookingRef(ref);
-
       const submissionData = {
         ...formData,
         service_type: config.serviceName,
         package: getPackageLabel(),
         estimated_cost: calculateCost(),
-        booking_reference: ref,
-        submitted_at: new Date().toISOString(),
       };
 
-      if (theme === 'dialysis' && addonSelected) {
+      if (theme === "dialysis" && addonSelected) {
         submissionData.companion_addon = getAddonLabel();
       }
 
+      let result = null;
       if (onSubmit) {
-        await onSubmit(submissionData);
+        result = await onSubmit(submissionData);
       }
 
+      // Use refNumber from apiClient result
+      const refNumber =
+        result?.refNumber || "TM" + Date.now().toString().slice(-6);
+      setBookingRef(refNumber);
       setShowSuccessModal(true);
     } catch (error) {
-      console.error('Submission error:', error);
-      alert('There was an error submitting your booking. Please try again.');
+      console.error("Submission error:", error);
+      alert("There was an error submitting your booking. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -435,19 +450,21 @@ export default function BookingSummary({
       {/* Summary Cards */}
       <div className="booking-summary__cards">
         {config.cards.map((card) => (
-          <div 
-            key={card.id} 
-            className={`booking-summary__card ${card.isMainCard ? 'booking-summary__card--main' : ''}`}
+          <div
+            key={card.id}
+            className={`booking-summary__card ${card.isMainCard ? "booking-summary__card--main" : ""}`}
           >
             <h3 className="booking-summary__card-title">
               {icons[card.icon]}
               {card.title}
             </h3>
-            
+
             {card.fields.map((field, idx) => (
               <div key={idx} className="booking-summary__item">
                 <span className="booking-summary__label">{field.label}</span>
-                <span className={`booking-summary__value ${field.key === 'email' ? 'booking-summary__value--raw' : ''}`}>
+                <span
+                  className={`booking-summary__value ${field.key === "email" ? "booking-summary__value--raw" : ""}`}
+                >
                   {getFieldValue(field)}
                 </span>
               </div>
@@ -456,13 +473,17 @@ export default function BookingSummary({
             {card.costField && (
               <>
                 <div className="booking-summary__item booking-summary__item--cost">
-                  <span className="booking-summary__label">{card.costField.label}</span>
+                  <span className="booking-summary__label">
+                    {card.costField.label}
+                  </span>
                   <span className="booking-summary__value booking-summary__value--cost">
                     RM {calculateCost().toLocaleString()}
                   </span>
                 </div>
                 {card.costField.note && (
-                  <p className="booking-summary__cost-note">{card.costField.note}</p>
+                  <p className="booking-summary__cost-note">
+                    {card.costField.note}
+                  </p>
                 )}
               </>
             )}
@@ -540,16 +561,16 @@ export default function BookingSummary({
           type="button"
           className="btn btn--payment"
           onClick={handleSubmit}
-          disabled={isSubmitting || !termsAgreed}
+          disabled={!termsAgreed || isSubmitting}
         >
           {isSubmitting ? (
             <>
-              <span className="booking-summary__spinner"></span>
-              Processing...
+              <span className="spinner"></span>
+              Submitting...
             </>
           ) : (
             <>
-              {icons['credit-card']}
+              {icons["credit-card"]}
               {config.submitButtonText}
             </>
           )}
@@ -568,4 +589,4 @@ export default function BookingSummary({
       />
     </div>
   );
-};
+}
