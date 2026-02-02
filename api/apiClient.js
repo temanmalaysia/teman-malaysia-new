@@ -91,11 +91,34 @@ const apiClient = {
       const googleScriptUrl = GOOGLE_SCRIPT_URLS[serviceType];
       const formspreeUrl = FORMSPREE_URLS[serviceType];
       
+      const normalizeCompanionFields = (data, type) => {
+        const d = { ...data };
+        if (!d.preferred_language && d.language_preference) {
+          d.preferred_language = d.language_preference;
+        }
+        if (!d.language_preference && d.preferred_language) {
+          d.language_preference = d.preferred_language;
+        }
+        if (!d.companion_gender && d.preferred_gender) {
+          d.companion_gender = d.preferred_gender;
+        }
+        const langSource = d.language_preference || d.preferred_language;
+        if (!d.companion_language && langSource) {
+          d.companion_language = langSource;
+        }
+        if (!d.employer && d.employer_name) {
+          d.employer = d.employer_name;
+        }
+        return d;
+      };
+
+      const normalizedData = normalizeCompanionFields(formData, serviceType);
+
       // Prepare data with metadata
       const enrichedData = {
         booking_reference: refNumber,
         service_type: formatServiceType(serviceType),
-        ...formData,
+        ...normalizedData,
         submitted_at: new Date().toLocaleString('en-MY', { timeZone: 'Asia/Kuala_Lumpur' }),
       };
 

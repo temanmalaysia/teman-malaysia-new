@@ -45,7 +45,7 @@ export const bookingSummaryData = {
           { key: 'email', label: 'Email:' },
           { key: 'relationship', label: 'Relationship:' },
           { key: 'emergency_contact', label: 'Emergency Contact:' },
-          { key: 'employer', label: 'Employer:', default: 'Not specified' },
+          { key: 'employer_name', label: 'Employer:', default: 'Not specified' },
           { key: 'staff_id', label: 'Staff ID:', default: 'Not specified' },
         ],
       },

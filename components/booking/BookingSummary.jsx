@@ -376,11 +376,32 @@ export default function BookingSummary({
 
     const value = formData[key];
 
-    if (value === null || value === undefined || value === "") {
+    const altKeysMap = {
+      preferred_language: ["language_preference", "companion_language", "patient_language"],
+      language_preference: ["preferred_language", "companion_language", "patient_language"],
+      companion_language: ["language_preference", "preferred_language", "patient_language"],
+      companion_gender: ["preferred_gender"],
+      preferred_gender: ["companion_gender"],
+      employer: ["employer_name"],
+    };
+
+    let resolvedValue = value;
+    if (resolvedValue === null || resolvedValue === undefined || resolvedValue === "") {
+      const alts = altKeysMap[key] || [];
+      for (const alt of alts) {
+        const v = formData[alt];
+        if (v !== null && v !== undefined && v !== "") {
+          resolvedValue = v;
+          break;
+        }
+      }
+    }
+
+    if (resolvedValue === null || resolvedValue === undefined || resolvedValue === "") {
       return defaultValue || "-";
     }
 
-    const formattedValue = formatText(value, format);
+    const formattedValue = formatText(resolvedValue, format);
 
     if (
       formattedValue === null ||
@@ -411,8 +432,24 @@ export default function BookingSummary({
         ...formData,
         service_type: config.serviceName,
         package: getPackageLabel(),
-        estimated_cost: calculateCost(),
+        estimated_cost: `RM ${calculateCost().toLocaleString()}`,
       };
+
+      if (!submissionData.preferred_language && submissionData.language_preference) {
+        submissionData.preferred_language = submissionData.language_preference;
+      }
+      if (!submissionData.language_preference && submissionData.preferred_language) {
+        submissionData.language_preference = submissionData.preferred_language;
+      }
+      if (theme === "customActivities") {
+        if (!submissionData.companion_gender && submissionData.preferred_gender) {
+          submissionData.companion_gender = submissionData.preferred_gender;
+        }
+        const langSource = submissionData.language_preference || submissionData.preferred_language;
+        if (!submissionData.companion_language && langSource) {
+          submissionData.companion_language = langSource;
+        }
+      }
 
       if (theme === "dialysis" && addonSelected) {
         submissionData.companion_addon = getAddonLabel();
