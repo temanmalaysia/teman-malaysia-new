@@ -377,16 +377,32 @@ export default function BookingSummary({
     const value = formData[key];
 
     const altKeysMap = {
-      preferred_language: ["language_preference", "companion_language", "patient_language"],
-      language_preference: ["preferred_language", "companion_language", "patient_language"],
-      companion_language: ["language_preference", "preferred_language", "patient_language"],
+      preferred_language: [
+        "language_preference",
+        "companion_language",
+        "patient_language",
+      ],
+      language_preference: [
+        "preferred_language",
+        "companion_language",
+        "patient_language",
+      ],
+      companion_language: [
+        "language_preference",
+        "preferred_language",
+        "patient_language",
+      ],
       companion_gender: ["preferred_gender"],
       preferred_gender: ["companion_gender"],
       employer: ["employer_name"],
     };
 
     let resolvedValue = value;
-    if (resolvedValue === null || resolvedValue === undefined || resolvedValue === "") {
+    if (
+      resolvedValue === null ||
+      resolvedValue === undefined ||
+      resolvedValue === ""
+    ) {
       const alts = altKeysMap[key] || [];
       for (const alt of alts) {
         const v = formData[alt];
@@ -397,7 +413,11 @@ export default function BookingSummary({
       }
     }
 
-    if (resolvedValue === null || resolvedValue === undefined || resolvedValue === "") {
+    if (
+      resolvedValue === null ||
+      resolvedValue === undefined ||
+      resolvedValue === ""
+    ) {
       return defaultValue || "-";
     }
 
@@ -435,25 +455,85 @@ export default function BookingSummary({
         estimated_cost: `RM ${calculateCost().toLocaleString()}`,
       };
 
-      if (!submissionData.preferred_language && submissionData.language_preference) {
+      // Normalize language/companion preferences
+      if (
+        !submissionData.preferred_language &&
+        submissionData.language_preference
+      ) {
         submissionData.preferred_language = submissionData.language_preference;
       }
-      if (!submissionData.language_preference && submissionData.preferred_language) {
+      if (
+        !submissionData.language_preference &&
+        submissionData.preferred_language
+      ) {
         submissionData.language_preference = submissionData.preferred_language;
       }
+
       if (theme === "customActivities") {
-        if (!submissionData.companion_gender && submissionData.preferred_gender) {
+        if (
+          !submissionData.companion_gender &&
+          submissionData.preferred_gender
+        ) {
           submissionData.companion_gender = submissionData.preferred_gender;
         }
-        const langSource = submissionData.language_preference || submissionData.preferred_language;
+        const langSource =
+          submissionData.language_preference ||
+          submissionData.preferred_language;
         if (!submissionData.companion_language && langSource) {
           submissionData.companion_language = langSource;
         }
+
+        // Ensure activity_dates is converted to string
+        if (formData.activity_dates) {
+          submissionData.activity_dates = Array.isArray(formData.activity_dates)
+            ? formData.activity_dates.join(", ")
+            : formData.activity_dates;
+        }
       }
 
-      if (theme === "dialysis" && addonSelected) {
-        submissionData.companion_addon = getAddonLabel();
+      // Handle dialysis-specific fields
+      if (theme === "dialysis") {
+        if (addonSelected) {
+          submissionData.companion_addon = getAddonLabel();
+        }
+
+        // Convert treatment_dates array to string
+        if (formData.treatment_dates) {
+          submissionData.treatment_dates = Array.isArray(
+            formData.treatment_dates,
+          )
+            ? formData.treatment_dates.join(", ")
+            : formData.treatment_dates;
+        }
+
+        // Ensure treatment_start_time is included
+        if (formData.treatment_start_time) {
+          submissionData.treatment_start_time = formData.treatment_start_time;
+        }
       }
+
+      // Handle homePackage-specific fields
+      if (theme === "homePackage") {
+        // Convert care_dates array to string
+        if (formData.care_dates) {
+          submissionData.care_dates = Array.isArray(formData.care_dates)
+            ? formData.care_dates.join(", ")
+            : formData.care_dates;
+        }
+
+        // Convert care_services array to string
+        if (formData.care_services) {
+          submissionData.care_services = Array.isArray(formData.care_services)
+            ? formData.care_services.join(", ")
+            : formData.care_services;
+        }
+      }
+
+      // Debug log - remove after testing
+      console.log("=== FINAL SUBMISSION DATA ===");
+      console.log("treatment_dates:", submissionData.treatment_dates);
+      console.log("treatment_start_time:", submissionData.treatment_start_time);
+      console.log("Full submissionData:", submissionData);
 
       let result = null;
       if (onSubmit) {

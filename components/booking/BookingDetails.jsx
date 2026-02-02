@@ -206,6 +206,12 @@ export default function BookingDetails({
       }
     }
 
+    console.log('=== BOOKING DETAILS - formData ===');
+  console.log('treatment_dates:', formData.treatment_dates);
+  console.log('treatment_start_time:', formData.treatment_start_time);
+  console.log('Full formData:', formData);
+
+
     onContinue();
   };
 

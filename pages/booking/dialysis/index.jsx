@@ -79,6 +79,14 @@ export default function Dialysis() {
                   addonHours={addonHours}
                   onBack={handleBack}
                   onSubmit={async (payload) => {
+                    console.log("=== DIALYSIS PAYLOAD ===");
+                    console.log("treatment_dates:", payload.treatment_dates);
+                    console.log(
+                      "treatment_start_time:",
+                      payload.treatment_start_time,
+                    );
+                    console.log("Full payload:", payload);
+
                     try {
                       const result = await apiClient.booking.submit(
                         payload,

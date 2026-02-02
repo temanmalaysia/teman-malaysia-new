@@ -91,28 +91,119 @@ const apiClient = {
       const googleScriptUrl = GOOGLE_SCRIPT_URLS[serviceType];
       const formspreeUrl = FORMSPREE_URLS[serviceType];
       
-      const normalizeCompanionFields = (data, type) => {
+      /**
+       * Normalize field names to match Google Apps Script expected field names
+       */
+      const normalizeFieldNames = (data, type) => {
         const d = { ...data };
-        if (!d.preferred_language && d.language_preference) {
-          d.preferred_language = d.language_preference;
-        }
-        if (!d.language_preference && d.preferred_language) {
-          d.language_preference = d.preferred_language;
-        }
-        if (!d.companion_gender && d.preferred_gender) {
+        
+        // ============================================
+        // DEBUG - Remove after testing
+        // ============================================
+        console.log('=== RAW DATA RECEIVED ===');
+        console.log('All keys:', Object.keys(d));
+        console.log('---');
+        console.log('preferred_gender:', d.preferred_gender);
+        console.log('preferred_language:', d.preferred_language);
+        console.log('language_preference:', d.language_preference);
+        console.log('patient_language:', d.patient_language);
+        console.log('companion_gender (before):', d.companion_gender);
+        console.log('companion_language (before):', d.companion_language);
+        console.log('---');
+        // ============================================
+        
+        // Map preferred_gender to companion_gender (what Google Apps Script expects)
+        if (d.preferred_gender) {
           d.companion_gender = d.preferred_gender;
         }
-        const langSource = d.language_preference || d.preferred_language;
-        if (!d.companion_language && langSource) {
-          d.companion_language = langSource;
+        
+        // Map language fields to companion_language (what Google Apps Script expects)
+        // Check all possible field names for language preference
+        const langValue = d.preferred_language || d.language_preference || d.patient_language || '';
+        if (langValue) {
+          d.companion_language = langValue;
         }
-        if (!d.employer && d.employer_name) {
+        
+        // Also handle employer mapping
+        if (d.employer_name && !d.employer) {
           d.employer = d.employer_name;
         }
+
+        // Dialysis-specific field mappings
+        if (type === 'dialysis') {
+          // Map treatment_dates to "multi_dates" (what Google Apps Script expects)
+          const dateList = Array.isArray(d.treatment_dates)
+            ? d.treatment_dates.join(', ')
+            : (d.treatment_dates || '');
+          if (dateList) {
+            d.multi_dates = dateList;
+          }
+          
+          // Map treatment_start_time to "preferred_start_time" (what Google Apps Script expects)
+          const startTime = d.treatment_start_time || '';
+          if (startTime) {
+            d.preferred_start_time = startTime;
+          }
+
+          // Map other dialysis fields to match Google Apps Script
+          if (d.typical_session_duration && !d.session_duration) {
+            d.session_duration = d.typical_session_duration;
+          }
+          if (d.facility_address && !d.center_address) {
+            d.center_address = d.facility_address;
+          }
+          if (d.restrictions && !d.dietary_restrictions) {
+            d.dietary_restrictions = d.restrictions;
+          }
+          if (d.regular_schedule && !d.treatment_schedule) {
+            d.treatment_schedule = d.regular_schedule;
+          }
+        }
+
+        // Custom Activities field mappings
+        if (type === 'customActivities') {
+          // Map activity_dates if needed
+          const activityDates = Array.isArray(d.activity_dates)
+            ? d.activity_dates.join(', ')
+            : (d.activity_dates || '');
+          if (activityDates) {
+            d['Activity Dates'] = activityDates;
+          }
+        }
+
+        // Home Package field mappings
+        if (type === 'homePackage') {
+          // Map care_dates if needed
+          const careDates = Array.isArray(d.care_dates)
+            ? d.care_dates.join(', ')
+            : (d.care_dates || '');
+          if (careDates) {
+            d['Care Dates'] = careDates;
+          }
+          
+          // Map care_services if needed
+          const careServices = Array.isArray(d.care_services)
+            ? d.care_services.join(', ')
+            : (d.care_services || '');
+          if (careServices) {
+            d['Care Services'] = careServices;
+          }
+        }
+
+        // ============================================
+        // DEBUG - Remove after testing
+        // ============================================
+        console.log('=== AFTER NORMALIZATION ===');
+        console.log('companion_gender (after):', d.companion_gender);
+        console.log('companion_language (after):', d.companion_language);
+        console.log('multi_dates:', d.multi_dates);
+        console.log('preferred_start_time:', d.preferred_start_time);
+        // ============================================
+
         return d;
       };
 
-      const normalizedData = normalizeCompanionFields(formData, serviceType);
+      const normalizedData = normalizeFieldNames(formData, serviceType);
 
       // Prepare data with metadata
       const enrichedData = {
@@ -121,6 +212,15 @@ const apiClient = {
         ...normalizedData,
         submitted_at: new Date().toLocaleString('en-MY', { timeZone: 'Asia/Kuala_Lumpur' }),
       };
+
+      // ============================================
+      // DEBUG - Remove after testing
+      // ============================================
+      console.log('=== FINAL DATA BEING SENT ===');
+      console.log('companion_gender:', enrichedData.companion_gender);
+      console.log('companion_language:', enrichedData.companion_language);
+      console.log('Full enrichedData:', enrichedData);
+      // ============================================
 
       const params = toURLParams(enrichedData);
 
