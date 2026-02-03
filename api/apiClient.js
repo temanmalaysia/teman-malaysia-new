@@ -6,12 +6,13 @@ const GOOGLE_SCRIPT_URLS = {
   homePackage: 'https://script.google.com/macros/s/AKfycbyvuJ84qdac6nJYS03ZOwFT3N8zAyS9IrTYV0G5IGW2s-bwfYoSOlj-W79N4s-WgStn_Q/exec',
 };
 
-// Formspree URLs for email notifications
+// Formspree URLs - DISABLED to prevent spam
+// Uncomment when ready to re-enable email notifications
 const FORMSPREE_URLS = {
-  health: 'https://formspree.io/f/xnnzgblw',
-  dialysis: 'https://formspree.io/f/xzzvjavz',
-  customActivities: 'https://formspree.io/f/xblkzawz',
-  homePackage: 'https://formspree.io/f/mzzvjaqp',
+  health: '',      // was: 'https://formspree.io/f/xnnzgblw'
+  dialysis: '',    // was: 'https://formspree.io/f/xzzvjavz'
+  customActivities: '', // was: 'https://formspree.io/f/xblkzawz'
+  homePackage: '',      // was: 'https://formspree.io/f/mzzvjaqp'
 };
 
 const PAYMENT_URL = 'https://www.billplz.com/deposit4Teman';
@@ -367,9 +368,9 @@ const apiClient = {
           throw new Error('Google Sheets submission failed: ' + (sheetsData.message || 'Unknown error'));
         }
 
-        // 2. Send email notification via Formspree (optional)
+        // 2. Send email notification via Formspree (optional, skip if URL is empty)
         let emailSent = false;
-        if (sendEmail) {
+        if (sendEmail && formspreeUrl) {
           try {
             const formDataObj = new FormData();
             for (const [key, value] of Object.entries(enrichedData)) {
