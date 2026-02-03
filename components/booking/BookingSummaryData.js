@@ -382,8 +382,6 @@ export const bookingSummaryData = {
         fields: [
           { key: 'preferred_gender', label: 'Preferred Gender:', default: 'No preference' },
           { key: 'preferred_language', label: 'Language Preference:', default: 'English' },
-          { key: 'companion_age', label: 'Age Preference:' },
-          { key: 'personality_traits', label: 'Personality Traits:' },
           { key: 'additional_notes', label: 'Additional Notes:', default: 'None' },
         ],
       },

@@ -397,6 +397,9 @@ export default function BookingSummary({
       employer: ["employer_name"],
       planned_activities: ["activities_list"],
       activities_list: ["planned_activities"],
+      allergies: ["restrictions", "dietary_restrictions"],
+      restrictions: ["allergies", "dietary_restrictions"],
+      dietary_restrictions: ["restrictions", "allergies"],
     };
 
     let resolvedValue = value;

@@ -1181,6 +1181,16 @@ export const homePackageDetailsSections = [
         placeholder: "e.g. Kuala Lumpur",
         required: true,
       },
+      {
+        name: "home_access_info",
+        label: "Home Access Information",
+        type: "textarea",
+        placeholder:
+          "Special access instructions, elevator, stairs, gate codes, etc.",
+        required: false,
+        fullWidth: true,
+        rows: 3,
+      },
     ],
   },
   {
@@ -1306,7 +1316,7 @@ export const homePackageDetailsSections = [
       },
       {
         name: "restrictions",
-        label: "Dietary Restrictions or Allergies",
+        label: "Allergies & Dietary Restrictions",
         type: "textarea",
         placeholder:
           "Food allergies, medication allergies, dietary restrictions, etc...",
