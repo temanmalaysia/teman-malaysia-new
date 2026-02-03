@@ -97,21 +97,6 @@ const apiClient = {
       const normalizeFieldNames = (data, type) => {
         const d = { ...data };
         
-        // ============================================
-        // DEBUG - Remove after testing
-        // ============================================
-        console.log('=== RAW DATA RECEIVED ===');
-        console.log('All keys:', Object.keys(d));
-        console.log('---');
-        console.log('preferred_gender:', d.preferred_gender);
-        console.log('preferred_language:', d.preferred_language);
-        console.log('language_preference:', d.language_preference);
-        console.log('patient_language:', d.patient_language);
-        console.log('companion_gender (before):', d.companion_gender);
-        console.log('companion_language (before):', d.companion_language);
-        console.log('---');
-        // ============================================
-        
         // Map preferred_gender to companion_gender (what Google Apps Script expects)
         if (d.preferred_gender) {
           d.companion_gender = d.preferred_gender;
@@ -162,12 +147,117 @@ const apiClient = {
 
         // Custom Activities field mappings
         if (type === 'customActivities') {
-          // Map activity_dates if needed
           const activityDates = Array.isArray(d.activity_dates)
             ? d.activity_dates.join(', ')
             : (d.activity_dates || '');
           if (activityDates) {
             d['Activity Dates'] = activityDates;
+            // Also ensure activity_dates is a string for the Google Apps Script
+            d.activity_dates = activityDates;
+          }
+
+          if (!d.planned_activities && d.activities_list) {
+            d.planned_activities = d.activities_list;
+          }
+          if (!d.activities_list && d.planned_activities) {
+            d.activities_list = d.planned_activities;
+          }
+
+          const activitiesValue = d.planned_activities || d.activities_list || '';
+          if (activitiesValue) {
+            d['Activities'] = activitiesValue;
+          }
+
+          // ====================================================
+          // FIX: Map patient_* fields to participant_* fields
+          // CareRecipientSelector stores data as patient_* but
+          // the Google Apps Script expects participant_*
+          // ====================================================
+          if (d.patient_name && !d.participant_name) {
+            d.participant_name = d.patient_name;
+          }
+          if (d.patient_age && !d.participant_age) {
+            d.participant_age = d.patient_age;
+          }
+          if (d.patient_gender && !d.participant_gender) {
+            d.participant_gender = d.patient_gender;
+          }
+          if (d.patient_language && !d.participant_language) {
+            d.participant_language = d.patient_language;
+          }
+          if (d.patient_weight && !d.participant_weight) {
+            d.participant_weight = d.patient_weight;
+          }
+          if (d.patient_height && !d.participant_height) {
+            d.participant_height = d.patient_height;
+          }
+
+          // ====================================================
+          // FIX: Map activity time fields
+          // Form may use start_time or activity_start_time but
+          // Google Apps Script expects activity_time
+          // ====================================================
+          if (!d.activity_time) {
+            d.activity_time = d.start_time || d.activity_start_time || d.preferred_start_time || '';
+          }
+
+          // ====================================================
+          // FIX: Map meeting/location fields
+          // Form may use pickup_address or meeting_point but
+          // Google Apps Script expects meeting_address
+          // ====================================================
+          if (!d.meeting_address) {
+            d.meeting_address = d.pickup_address || d.meeting_point || '';
+          }
+
+          // Map activity_location (singular) to activity_locations (plural)
+          if (d.activity_location && !d.activity_locations) {
+            d.activity_locations = d.activity_location;
+          }
+
+          // ====================================================
+          // FIX: Map health/medical fields
+          // ====================================================
+          if (d.restrictions && !d.dietary_restrictions) {
+            d.dietary_restrictions = d.restrictions;
+          }
+          if (d.medical_conditions && !d.health_conditions) {
+            d.health_conditions = d.medical_conditions;
+          }
+
+          // ====================================================
+          // FIX: Map duration field
+          // Google Apps Script expects 'duration'
+          // ====================================================
+          if (!d.duration && d.activity_duration) {
+            d.duration = d.activity_duration;
+          }
+
+          // ====================================================
+          // FIX: Map previous_experience (singular) →
+          //      previous_experiences (plural, what Google Apps Script expects)
+          // ====================================================
+          if (d.previous_experience && !d.previous_experiences) {
+            d.previous_experiences = d.previous_experience;
+          }
+          if (d.experience && !d.previous_experiences) {
+            d.previous_experiences = d.experience;
+          }
+
+          // ====================================================
+          // FIX: Map postal_code / zip_code → postcode
+          //      (Google Apps Script expects "postcode")
+          // ====================================================
+          if (!d.postcode) {
+            d.postcode = d.area_postcode || d.postal_code || d.zip_code || d.post_code || '';
+          }
+
+          // ====================================================
+          // FIX: Map city_name / area / town → city
+          //      (Google Apps Script expects "city")
+          // ====================================================
+          if (!d.city) {
+            d.city = d.area_city || d.city_name || d.area || d.town || '';
           }
         }
 
@@ -190,16 +280,6 @@ const apiClient = {
           }
         }
 
-        // ============================================
-        // DEBUG - Remove after testing
-        // ============================================
-        console.log('=== AFTER NORMALIZATION ===');
-        console.log('companion_gender (after):', d.companion_gender);
-        console.log('companion_language (after):', d.companion_language);
-        console.log('multi_dates:', d.multi_dates);
-        console.log('preferred_start_time:', d.preferred_start_time);
-        // ============================================
-
         return d;
       };
 
@@ -212,15 +292,6 @@ const apiClient = {
         ...normalizedData,
         submitted_at: new Date().toLocaleString('en-MY', { timeZone: 'Asia/Kuala_Lumpur' }),
       };
-
-      // ============================================
-      // DEBUG - Remove after testing
-      // ============================================
-      console.log('=== FINAL DATA BEING SENT ===');
-      console.log('companion_gender:', enrichedData.companion_gender);
-      console.log('companion_language:', enrichedData.companion_language);
-      console.log('Full enrichedData:', enrichedData);
-      // ============================================
 
       const params = toURLParams(enrichedData);
 

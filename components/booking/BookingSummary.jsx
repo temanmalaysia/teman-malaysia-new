@@ -395,6 +395,8 @@ export default function BookingSummary({
       companion_gender: ["preferred_gender"],
       preferred_gender: ["companion_gender"],
       employer: ["employer_name"],
+      planned_activities: ["activities_list"],
+      activities_list: ["planned_activities"],
     };
 
     let resolvedValue = value;
@@ -453,6 +455,8 @@ export default function BookingSummary({
         service_type: config.serviceName,
         package: getPackageLabel(),
         estimated_cost: `RM ${calculateCost().toLocaleString()}`,
+        // FIX: Include hours in submission data so Google Apps Script receives it
+        hours: selectedHours || '',
       };
 
       // Normalize language/companion preferences
@@ -483,11 +487,92 @@ export default function BookingSummary({
           submissionData.companion_language = langSource;
         }
 
+        if (!submissionData.planned_activities && submissionData.activities_list) {
+          submissionData.planned_activities = submissionData.activities_list;
+        }
+        if (!submissionData.activities_list && submissionData.planned_activities) {
+          submissionData.activities_list = submissionData.planned_activities;
+        }
+
         // Ensure activity_dates is converted to string
         if (formData.activity_dates) {
           submissionData.activity_dates = Array.isArray(formData.activity_dates)
             ? formData.activity_dates.join(", ")
             : formData.activity_dates;
+        }
+
+        // ====================================================
+        // FIX: Map patient_* to participant_* for customActivities
+        // CareRecipientSelector stores as patient_* but Google
+        // Apps Script expects participant_*
+        // ====================================================
+        if (formData.patient_name && !submissionData.participant_name) {
+          submissionData.participant_name = formData.patient_name;
+        }
+        if (formData.patient_age && !submissionData.participant_age) {
+          submissionData.participant_age = formData.patient_age;
+        }
+        if (formData.patient_gender && !submissionData.participant_gender) {
+          submissionData.participant_gender = formData.patient_gender;
+        }
+        if (formData.patient_language && !submissionData.participant_language) {
+          submissionData.participant_language = formData.patient_language;
+        }
+        if (formData.patient_weight && !submissionData.participant_weight) {
+          submissionData.participant_weight = formData.patient_weight;
+        }
+        if (formData.patient_height && !submissionData.participant_height) {
+          submissionData.participant_height = formData.patient_height;
+        }
+
+        // FIX: Map activity time field
+        if (!submissionData.activity_time) {
+          submissionData.activity_time = formData.start_time || formData.activity_start_time || formData.preferred_start_time || '';
+        }
+
+        // FIX: Map meeting address
+        if (!submissionData.meeting_address) {
+          submissionData.meeting_address = formData.pickup_address || formData.meeting_point || '';
+        }
+
+        // FIX: Map activity_location → activity_locations
+        if (formData.activity_location && !submissionData.activity_locations) {
+          submissionData.activity_locations = formData.activity_location;
+        }
+
+        // FIX: Map postcode and city
+        if (formData.postcode) {
+          submissionData.postcode = formData.postcode;
+        }
+        if (formData.city) {
+          submissionData.city = formData.city;
+        }
+
+        // FIX: Map health/medical fields
+        if (formData.medical_conditions && !submissionData.health_conditions) {
+          submissionData.health_conditions = formData.medical_conditions;
+        }
+        if (formData.restrictions && !submissionData.dietary_restrictions) {
+          submissionData.dietary_restrictions = formData.restrictions;
+        }
+
+        // FIX: Map duration
+        if (!submissionData.duration) {
+          submissionData.duration = selectedHours || formData.activity_duration || '';
+        }
+
+        if (!submissionData.previous_experiences) {
+          submissionData.previous_experiences = formData.previous_experiences || formData.previous_experience || formData.experience || '';
+        }
+
+        // FIX: Ensure postcode is mapped (try alternate field names)
+        if (!submissionData.postcode) {
+          submissionData.postcode = formData.postcode || formData.area_postcode || formData.postal_code || formData.zip_code || formData.post_code || '';
+        }
+
+        // FIX: Ensure city is mapped (try alternate field names)
+        if (!submissionData.city) {
+          submissionData.city = formData.city || formData.area_city || formData.city_name || formData.area || formData.town || '';
         }
       }
 
@@ -529,14 +614,18 @@ export default function BookingSummary({
         }
       }
 
-      // Debug log - remove after testing
-      console.log("=== FINAL SUBMISSION DATA ===");
-      console.log("treatment_dates:", submissionData.treatment_dates);
-      console.log("treatment_start_time:", submissionData.treatment_start_time);
-      console.log("Full submissionData:", submissionData);
-
       let result = null;
       if (onSubmit) {
+        // DEBUG: Remove after confirming postcode/city/previous_experiences are working
+        console.log('=== FIELD NAME CHECK ===');
+        console.log('All formData keys:', Object.keys(formData));
+        console.log('postcode:', formData.postcode, '| postal_code:', formData.postal_code);
+        console.log('city:', formData.city, '| city_name:', formData.city_name);
+        console.log('previous_experience:', formData.previous_experience, '| previous_experiences:', formData.previous_experiences);
+        console.log('submissionData.postcode:', submissionData.postcode);
+        console.log('submissionData.city:', submissionData.city);
+        console.log('submissionData.previous_experiences:', submissionData.previous_experiences);
+        console.log('========================');
         result = await onSubmit(submissionData);
       }
 
