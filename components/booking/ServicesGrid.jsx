@@ -1,4 +1,6 @@
 import Link from 'next/link';
+import { useState } from 'react';
+import InfoModal from '@/components/modal/InfoModal';
 import { FaStethoscope, FaHeartbeat, FaUsers, FaHome, FaCheck, FaArrowRight } from 'react-icons/fa';
 
 const icons = {
@@ -108,6 +110,9 @@ const ServiceIcon = ({ icon }) => {
 };
 
 export default function ServicesGrid() {
+  const [noticeOpen, setNoticeOpen] = useState(false);
+  const [noticeTheme, setNoticeTheme] = useState('health');
+  const message = "We’re working on fixing a technical issue with our website. In the meantime, for any booking inquiries, please contact us directly through WhatsApp. We appreciate your patience.";
   return (
     <section className="services-grid-section">
       <div className="container">
@@ -117,6 +122,8 @@ export default function ServicesGrid() {
               key={service.id}
               href={service.href}
               className={`service-card service-card--${service.theme}`}
+              onClick={(e) => { e.preventDefault(); setNoticeOpen(true); setNoticeTheme(service.theme); }}
+              data-testid={`service-card-${service.id}`}
             >
               <div className="service-card__header">
                 <div className="service-card__icon">
@@ -154,6 +161,13 @@ export default function ServicesGrid() {
           ))}
         </div>
       </div>
+      <InfoModal
+        isOpen={noticeOpen}
+        onClose={() => setNoticeOpen(false)}
+        title="Booking Notice"
+        message={message}
+        theme={noticeTheme}
+      />
     </section>
   );
 }

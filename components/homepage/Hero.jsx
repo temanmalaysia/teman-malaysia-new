@@ -3,6 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { FaCalendarCheck } from 'react-icons/fa';
+import InfoModal from '@/components/modal/InfoModal';
 
 const services = [
   {
@@ -73,9 +74,15 @@ export default function Hero() {
   const [activeTab, setActiveTab] = useState(0);
   const activeService = services[activeTab];
   const router = useRouter();
+  const [noticeOpen, setNoticeOpen] = useState(false);
+  const message = "We’re working on fixing a technical issue with our website. In the meantime, for any booking inquiries, please contact us directly through WhatsApp. We appreciate your patience.";
+  const [noticeTheme, setNoticeTheme] = useState('health');
 
   const handleBookNow = () => {
-    router.push(activeService.link);
+    setNoticeTheme(activeService?.link?.includes('home-package') ? 'homePackage' :
+      activeService?.link?.includes('custom-activities') ? 'customActivities' :
+      activeService?.link?.includes('dialysis') ? 'dialysis' : 'health');
+    setNoticeOpen(true);
   };
 
   return (
@@ -142,6 +149,7 @@ export default function Hero() {
                   <button 
                     onClick={handleBookNow} 
                     className="service-package-card__book-btn"
+                    data-testid="hero-book-btn"
                   >
                     <FaCalendarCheck size={16} />
                     Book Now
@@ -151,6 +159,13 @@ export default function Hero() {
             </div>
           </div>
         </div>
+        <InfoModal
+          isOpen={noticeOpen}
+          onClose={() => setNoticeOpen(false)}
+          title="Booking Notice"
+          message={message}
+          theme={noticeTheme}
+        />
       </div>
     </section>
   );
