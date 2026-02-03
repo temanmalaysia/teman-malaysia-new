@@ -39,6 +39,7 @@ function formatServiceType(type) {
 
 /**
  * Convert form data object to URLSearchParams
+ * Keys ending with [] will have each array element appended separately
  */
 function toURLParams(data) {
   const params = new URLSearchParams();
@@ -47,8 +48,13 @@ function toURLParams(data) {
     if (value === null || value === undefined) {
       params.append(key, '');
     } else if (Array.isArray(value)) {
-      // Handle arrays (treatment_dates, care_services, etc.)
-      params.append(key, value.join(', '));
+      // For keys ending with [], append each value separately
+      // so Google Apps Script e.parameter receives them correctly
+      if (key.endsWith('[]')) {
+        value.forEach(v => params.append(key, String(v)));
+      } else {
+        params.append(key, value.join(', '));
+      }
     } else if (typeof value === 'object') {
       params.append(key, JSON.stringify(value));
     } else {
@@ -92,31 +98,37 @@ const apiClient = {
       const formspreeUrl = FORMSPREE_URLS[serviceType];
       
       /**
-       * Normalize field names to match Google Apps Script expected field names
+       * Normalize field names to match Google Apps Script expected field names.
+       * Each service's Google Script expects specific field names that may
+       * differ from what the React form components use.
        */
       const normalizeFieldNames = (data, type) => {
         const d = { ...data };
         
-        // Map preferred_gender to companion_gender (what Google Apps Script expects)
+        // =============================================
+        // COMMON MAPPINGS (all services)
+        // =============================================
+        
+        // Map preferred_gender to companion_gender
         if (d.preferred_gender) {
           d.companion_gender = d.preferred_gender;
         }
         
-        // Map language fields to companion_language (what Google Apps Script expects)
-        // Check all possible field names for language preference
+        // Map language fields to companion_language
         const langValue = d.preferred_language || d.language_preference || d.patient_language || '';
         if (langValue) {
           d.companion_language = langValue;
         }
         
-        // Also handle employer mapping
+        // Handle employer mapping
         if (d.employer_name && !d.employer) {
           d.employer = d.employer_name;
         }
 
-        // Dialysis-specific field mappings
+        // =============================================
+        // DIALYSIS MAPPINGS
+        // =============================================
         if (type === 'dialysis') {
-          // Map treatment_dates to "multi_dates" (what Google Apps Script expects)
           const dateList = Array.isArray(d.treatment_dates)
             ? d.treatment_dates.join(', ')
             : (d.treatment_dates || '');
@@ -124,13 +136,11 @@ const apiClient = {
             d.multi_dates = dateList;
           }
           
-          // Map treatment_start_time to "preferred_start_time" (what Google Apps Script expects)
           const startTime = d.treatment_start_time || '';
           if (startTime) {
             d.preferred_start_time = startTime;
           }
 
-          // Map other dialysis fields to match Google Apps Script
           if (d.typical_session_duration && !d.session_duration) {
             d.session_duration = d.typical_session_duration;
           }
@@ -145,14 +155,15 @@ const apiClient = {
           }
         }
 
-        // Custom Activities field mappings
+        // =============================================
+        // CUSTOM ACTIVITIES MAPPINGS
+        // =============================================
         if (type === 'customActivities') {
           const activityDates = Array.isArray(d.activity_dates)
             ? d.activity_dates.join(', ')
             : (d.activity_dates || '');
           if (activityDates) {
             d['Activity Dates'] = activityDates;
-            // Also ensure activity_dates is a string for the Google Apps Script
             d.activity_dates = activityDates;
           }
 
@@ -168,115 +179,160 @@ const apiClient = {
             d['Activities'] = activitiesValue;
           }
 
-          // ====================================================
-          // FIX: Map patient_* fields to participant_* fields
-          // CareRecipientSelector stores data as patient_* but
-          // the Google Apps Script expects participant_*
-          // ====================================================
-          if (d.patient_name && !d.participant_name) {
-            d.participant_name = d.patient_name;
-          }
-          if (d.patient_age && !d.participant_age) {
-            d.participant_age = d.patient_age;
-          }
-          if (d.patient_gender && !d.participant_gender) {
-            d.participant_gender = d.patient_gender;
-          }
-          if (d.patient_language && !d.participant_language) {
-            d.participant_language = d.patient_language;
-          }
-          if (d.patient_weight && !d.participant_weight) {
-            d.participant_weight = d.patient_weight;
-          }
-          if (d.patient_height && !d.participant_height) {
-            d.participant_height = d.patient_height;
-          }
+          // patient_* → participant_*
+          if (d.patient_name && !d.participant_name) d.participant_name = d.patient_name;
+          if (d.patient_age && !d.participant_age) d.participant_age = d.patient_age;
+          if (d.patient_gender && !d.participant_gender) d.participant_gender = d.patient_gender;
+          if (d.patient_language && !d.participant_language) d.participant_language = d.patient_language;
+          if (d.patient_weight && !d.participant_weight) d.participant_weight = d.patient_weight;
+          if (d.patient_height && !d.participant_height) d.participant_height = d.patient_height;
 
-          // ====================================================
-          // FIX: Map activity time fields
-          // Form may use start_time or activity_start_time but
-          // Google Apps Script expects activity_time
-          // ====================================================
+          // Activity time
           if (!d.activity_time) {
             d.activity_time = d.start_time || d.activity_start_time || d.preferred_start_time || '';
           }
 
-          // ====================================================
-          // FIX: Map meeting/location fields
-          // Form may use pickup_address or meeting_point but
-          // Google Apps Script expects meeting_address
-          // ====================================================
+          // Meeting address
           if (!d.meeting_address) {
             d.meeting_address = d.pickup_address || d.meeting_point || '';
           }
 
-          // Map activity_location (singular) to activity_locations (plural)
+          // activity_location → activity_locations
           if (d.activity_location && !d.activity_locations) {
             d.activity_locations = d.activity_location;
           }
 
-          // ====================================================
-          // FIX: Map health/medical fields
-          // ====================================================
-          if (d.restrictions && !d.dietary_restrictions) {
-            d.dietary_restrictions = d.restrictions;
-          }
-          if (d.medical_conditions && !d.health_conditions) {
-            d.health_conditions = d.medical_conditions;
-          }
+          // Medical fields
+          if (d.restrictions && !d.dietary_restrictions) d.dietary_restrictions = d.restrictions;
+          if (d.medical_conditions && !d.health_conditions) d.health_conditions = d.medical_conditions;
 
-          // ====================================================
-          // FIX: Map duration field
-          // Google Apps Script expects 'duration'
-          // ====================================================
-          if (!d.duration && d.activity_duration) {
-            d.duration = d.activity_duration;
-          }
+          // Duration
+          if (!d.duration && d.activity_duration) d.duration = d.activity_duration;
 
-          // ====================================================
-          // FIX: Map previous_experience (singular) →
-          //      previous_experiences (plural, what Google Apps Script expects)
-          // ====================================================
-          if (d.previous_experience && !d.previous_experiences) {
-            d.previous_experiences = d.previous_experience;
-          }
-          if (d.experience && !d.previous_experiences) {
-            d.previous_experiences = d.experience;
-          }
+          // previous_experience → previous_experiences
+          if (d.previous_experience && !d.previous_experiences) d.previous_experiences = d.previous_experience;
+          if (d.experience && !d.previous_experiences) d.previous_experiences = d.experience;
 
-          // ====================================================
-          // FIX: Map postal_code / zip_code → postcode
-          //      (Google Apps Script expects "postcode")
-          // ====================================================
+          // Postcode
           if (!d.postcode) {
             d.postcode = d.area_postcode || d.postal_code || d.zip_code || d.post_code || '';
           }
 
-          // ====================================================
-          // FIX: Map city_name / area / town → city
-          //      (Google Apps Script expects "city")
-          // ====================================================
+          // City
           if (!d.city) {
             d.city = d.area_city || d.city_name || d.area || d.town || '';
           }
         }
 
-        // Home Package field mappings
+        // =============================================
+        // HOME PACKAGE MAPPINGS
+        // Google Script expects specific field names
+        // that differ from the form field names
+        // =============================================
         if (type === 'homePackage') {
-          // Map care_dates if needed
+          // ---- package_cost ----
+          // Script expects "package_cost", form sends "estimated_cost"
+          if (!d.package_cost) {
+            d.package_cost = d.estimated_cost || '';
+          }
+
+          // ---- multi_dates ----
+          // Script expects "multi_dates", form sends "care_dates" (array)
           const careDates = Array.isArray(d.care_dates)
             ? d.care_dates.join(', ')
             : (d.care_dates || '');
-          if (careDates) {
-            d['Care Dates'] = careDates;
+          if (careDates && !d.multi_dates) {
+            d.multi_dates = careDates;
           }
-          
-          // Map care_services if needed
-          const careServices = Array.isArray(d.care_services)
-            ? d.care_services.join(', ')
-            : (d.care_services || '');
-          if (careServices) {
-            d['Care Services'] = careServices;
+          // Also ensure care_dates is a string
+          if (careDates) {
+            d.care_dates = careDates;
+          }
+
+          // ---- preferred_start_time / preferred_end_time ----
+          // Script expects "preferred_start_time" / "preferred_end_time"
+          // Form sends "start_time" / "end_time" (or care_start_time / care_end_time)
+          if (!d.preferred_start_time) {
+            d.preferred_start_time =
+              d.care_start_time ||
+              d.schedule_start ||
+              d.start_time ||
+              '';
+          }
+          if (!d.preferred_end_time) {
+            d.preferred_end_time =
+              d.care_end_time ||
+              d.schedule_end ||
+              d.end_time ||
+              '';
+          }
+
+          // ---- start_date / end_date ----
+          // Script expects "start_date" / "end_date"
+          // Form sends "service_start_date" / "service_end_date"
+          if (!d.start_date) {
+            d.start_date = d.service_start_date || '';
+          }
+          if (!d.end_date) {
+            d.end_date = d.service_end_date || '';
+          }
+
+          // ---- mobility_level ----
+          // Script expects "mobility_level", form sends "mobility_assistance"
+          if (!d.mobility_level) {
+            d.mobility_level =
+              d.mobility_assistance ||
+              d.mobility_status ||
+              '';
+          }
+
+          // ---- postcode ----
+          // Script expects "postcode", form may send "area_postcode"
+          if (!d.postcode) {
+            d.postcode =
+              d.area_postcode ||
+              d.postal_code ||
+              '';
+          }
+
+          // ---- city ----
+          // Script expects "city", form may send "area_city"
+          if (!d.city) {
+            d.city =
+              d.area_city ||
+              d.city_name ||
+              '';
+          }
+
+          // ---- home_access ----
+          // Form sends "home_access_info", Script expects "home_access"
+          if (!d.home_access) {
+            d.home_access = d.home_access_info || d.access_instructions || '';
+          }
+
+          // ---- allergies ----
+          // Form sends "restrictions", Script expects "allergies"
+          if (!d.allergies) {
+            d.allergies = d.restrictions || d.dietary_restrictions || '';
+          }
+
+          // ---- daily_routine ----
+          // Form sends "current_routine", Script expects "daily_routine"
+          if (!d.daily_routine) {
+            d.daily_routine = d.current_routine || '';
+          }
+
+          // ---- care_services[] ----
+          // Script expects key "care_services[]" (reads via data['care_services[]'])
+          // Form sends "care_services" as array or comma-separated string
+          const careServicesRaw = d.care_services;
+          if (careServicesRaw) {
+            const careServicesStr = Array.isArray(careServicesRaw)
+              ? careServicesRaw.join(', ')
+              : careServicesRaw;
+            d['care_services[]'] = careServicesStr;
+            // Also keep care_services as string
+            d.care_services = careServicesStr;
           }
         }
 

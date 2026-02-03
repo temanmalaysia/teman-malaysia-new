@@ -80,7 +80,6 @@ export default function BookingSummary({
 
   // ===========================================
   // COST CALCULATION
-  // Based on packageData.js values
   // ===========================================
   const calculateCost = () => {
     if (!selectedPackage) return 0;
@@ -458,7 +457,6 @@ export default function BookingSummary({
         service_type: config.serviceName,
         package: getPackageLabel(),
         estimated_cost: `RM ${calculateCost().toLocaleString()}`,
-        // FIX: Include hours in submission data so Google Apps Script receives it
         hours: selectedHours || '',
       };
 
@@ -497,18 +495,12 @@ export default function BookingSummary({
           submissionData.activities_list = submissionData.planned_activities;
         }
 
-        // Ensure activity_dates is converted to string
         if (formData.activity_dates) {
           submissionData.activity_dates = Array.isArray(formData.activity_dates)
             ? formData.activity_dates.join(", ")
             : formData.activity_dates;
         }
 
-        // ====================================================
-        // FIX: Map patient_* to participant_* for customActivities
-        // CareRecipientSelector stores as patient_* but Google
-        // Apps Script expects participant_*
-        // ====================================================
         if (formData.patient_name && !submissionData.participant_name) {
           submissionData.participant_name = formData.patient_name;
         }
@@ -528,30 +520,25 @@ export default function BookingSummary({
           submissionData.participant_height = formData.patient_height;
         }
 
-        // FIX: Map activity time field
         if (!submissionData.activity_time) {
           submissionData.activity_time = formData.start_time || formData.activity_start_time || formData.preferred_start_time || '';
         }
 
-        // FIX: Map meeting address
         if (!submissionData.meeting_address) {
           submissionData.meeting_address = formData.pickup_address || formData.meeting_point || '';
         }
 
-        // FIX: Map activity_location → activity_locations
         if (formData.activity_location && !submissionData.activity_locations) {
           submissionData.activity_locations = formData.activity_location;
         }
 
-        // FIX: Map postcode and city
-        if (formData.postcode) {
-          submissionData.postcode = formData.postcode;
+        if (!submissionData.postcode) {
+          submissionData.postcode = formData.postcode || formData.area_postcode || formData.postal_code || '';
         }
-        if (formData.city) {
-          submissionData.city = formData.city;
+        if (!submissionData.city) {
+          submissionData.city = formData.city || formData.area_city || formData.city_name || '';
         }
 
-        // FIX: Map health/medical fields
         if (formData.medical_conditions && !submissionData.health_conditions) {
           submissionData.health_conditions = formData.medical_conditions;
         }
@@ -559,23 +546,12 @@ export default function BookingSummary({
           submissionData.dietary_restrictions = formData.restrictions;
         }
 
-        // FIX: Map duration
         if (!submissionData.duration) {
           submissionData.duration = selectedHours || formData.activity_duration || '';
         }
 
         if (!submissionData.previous_experiences) {
           submissionData.previous_experiences = formData.previous_experiences || formData.previous_experience || formData.experience || '';
-        }
-
-        // FIX: Ensure postcode is mapped (try alternate field names)
-        if (!submissionData.postcode) {
-          submissionData.postcode = formData.postcode || formData.area_postcode || formData.postal_code || formData.zip_code || formData.post_code || '';
-        }
-
-        // FIX: Ensure city is mapped (try alternate field names)
-        if (!submissionData.city) {
-          submissionData.city = formData.city || formData.area_city || formData.city_name || formData.area || formData.town || '';
         }
       }
 
@@ -585,7 +561,6 @@ export default function BookingSummary({
           submissionData.companion_addon = getAddonLabel();
         }
 
-        // Convert treatment_dates array to string
         if (formData.treatment_dates) {
           submissionData.treatment_dates = Array.isArray(
             formData.treatment_dates,
@@ -594,45 +569,123 @@ export default function BookingSummary({
             : formData.treatment_dates;
         }
 
-        // Ensure treatment_start_time is included
         if (formData.treatment_start_time) {
           submissionData.treatment_start_time = formData.treatment_start_time;
         }
       }
 
-      // Handle homePackage-specific fields
+      // ====================================================
+      // FIX: homePackage field name mappings
+      // Form uses different field names than Google Apps Script
+      // ====================================================
       if (theme === "homePackage") {
-        // Convert care_dates array to string
+        // estimated_cost → package_cost
+        submissionData.package_cost =
+          submissionData.estimated_cost ||
+          `RM ${calculateCost().toLocaleString()}`;
+
+        // care_dates (array) → multi_dates (string)
         if (formData.care_dates) {
-          submissionData.care_dates = Array.isArray(formData.care_dates)
+          const careDatesStr = Array.isArray(formData.care_dates)
             ? formData.care_dates.join(", ")
             : formData.care_dates;
+          submissionData.care_dates = careDatesStr;
+          submissionData.multi_dates = careDatesStr;
         }
 
-        // Convert care_services array to string
+        // start_time / end_time → preferred_start_time / preferred_end_time
+        submissionData.preferred_start_time =
+          formData.care_start_time ||
+          formData.schedule_start ||
+          formData.start_time ||
+          formData.preferred_start_time ||
+          '';
+        submissionData.preferred_end_time =
+          formData.care_end_time ||
+          formData.schedule_end ||
+          formData.end_time ||
+          formData.preferred_end_time ||
+          '';
+
+        // service_start_date → start_date, service_end_date → end_date
+        submissionData.start_date =
+          formData.service_start_date ||
+          formData.start_date ||
+          '';
+        submissionData.end_date =
+          formData.service_end_date ||
+          formData.end_date ||
+          '';
+
+        // mobility_assistance → mobility_level
+        submissionData.mobility_level =
+          formData.mobility_level ||
+          formData.mobility_assistance ||
+          formData.mobility_status ||
+          '';
+
+        // postcode (try alternate field names)
+        if (!submissionData.postcode) {
+          submissionData.postcode =
+            formData.postcode ||
+            formData.area_postcode ||
+            formData.postal_code ||
+            '';
+        }
+
+        // city (try alternate field names)
+        if (!submissionData.city) {
+          submissionData.city =
+            formData.city ||
+            formData.area_city ||
+            formData.city_name ||
+            '';
+        }
+
+        // home_access_info → home_access
+        // Form sends "home_access_info", Script expects "home_access"
+        if (!submissionData.home_access) {
+          submissionData.home_access =
+            formData.home_access_info ||
+            formData.home_access ||
+            formData.access_instructions ||
+            '';
+        }
+
+        // restrictions → allergies
+        // Form sends "restrictions", Script expects "allergies"
+        if (!submissionData.allergies) {
+          submissionData.allergies =
+            formData.restrictions ||
+            formData.allergies ||
+            formData.dietary_restrictions ||
+            '';
+        }
+
+        // current_routine → daily_routine
+        // Form sends "current_routine", Script expects "daily_routine"
+        if (!submissionData.daily_routine) {
+          submissionData.daily_routine =
+            formData.current_routine ||
+            formData.daily_routine ||
+            '';
+        }
+
+        // care_services → care_services[] (Google Script expects this key)
         if (formData.care_services) {
-          submissionData.care_services = Array.isArray(formData.care_services)
-            ? formData.care_services.join(", ")
-            : formData.care_services;
+          const servicesArr = Array.isArray(formData.care_services)
+            ? formData.care_services
+            : [formData.care_services];
+          submissionData.care_services = servicesArr.join(", ");
+          submissionData['care_services[]'] = servicesArr;
         }
       }
 
       let result = null;
       if (onSubmit) {
-        // DEBUG: Remove after confirming postcode/city/previous_experiences are working
-        console.log('=== FIELD NAME CHECK ===');
-        console.log('All formData keys:', Object.keys(formData));
-        console.log('postcode:', formData.postcode, '| postal_code:', formData.postal_code);
-        console.log('city:', formData.city, '| city_name:', formData.city_name);
-        console.log('previous_experience:', formData.previous_experience, '| previous_experiences:', formData.previous_experiences);
-        console.log('submissionData.postcode:', submissionData.postcode);
-        console.log('submissionData.city:', submissionData.city);
-        console.log('submissionData.previous_experiences:', submissionData.previous_experiences);
-        console.log('========================');
         result = await onSubmit(submissionData);
       }
 
-      // Use refNumber from apiClient result
       const refNumber =
         result?.refNumber || "TM" + Date.now().toString().slice(-6);
       setBookingRef(refNumber);
@@ -716,7 +769,6 @@ export default function BookingSummary({
         </ul>
       </div>
 
-      {/* Tips Box (Custom Activities only) */}
       {config.tipsBox && (
         <div className="booking-summary__tips-box">
           <h3>
@@ -731,7 +783,6 @@ export default function BookingSummary({
         </div>
       )}
 
-      {/* Warning Box (Home Package only) */}
       {config.warningBox && (
         <div className="booking-summary__warning-box">
           <h3>
