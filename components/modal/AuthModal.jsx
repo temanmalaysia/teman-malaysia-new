@@ -14,7 +14,7 @@ const validatePassword = (password) => {
   };
 };
 
-export default function AuthModal({ isOpen, onClose, initialMode = 'signin' }) {
+export default function AuthModal({ isOpen, onClose, initialMode = 'signin', onSuccess }) {
   const [mode, setMode] = useState(initialMode);
   
   // Sign In state
@@ -95,7 +95,13 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'signin' }) {
     // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 1500));
     setIsLoading(false);
-    onClose();
+    try {
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('tm_signed_in', '1');
+      }
+    } catch {}
+    if (onSuccess) onSuccess();
+    else onClose();
   };
 
   if (!isOpen) return null;

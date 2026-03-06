@@ -3,6 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { FaCalendarCheck } from 'react-icons/fa';
+import AuthModal from '@/components/modal/AuthModal';
 
 const services = [
   {
@@ -73,9 +74,19 @@ export default function Hero() {
   const [activeTab, setActiveTab] = useState(0);
   const activeService = services[activeTab];
   const router = useRouter();
+  const [showAuth, setShowAuth] = useState(false);
+  const [pendingHref, setPendingHref] = useState(null);
 
   const handleBookNow = () => {
-    router.push(activeService.link);
+    const href = activeService.link;
+    const loggedIn =
+      typeof window !== 'undefined' && localStorage.getItem('tm_signed_in') === '1';
+    if (!loggedIn) {
+      setPendingHref(href);
+      setShowAuth(true);
+      return;
+    }
+    router.push(href);
   };
 
   return (
@@ -151,6 +162,17 @@ export default function Hero() {
             </div>
           </div>
         </div>
+      <AuthModal
+        isOpen={showAuth}
+        onClose={() => setShowAuth(false)}
+        initialMode="signin"
+        onSuccess={() => {
+          const target = pendingHref;
+          setShowAuth(false);
+          setPendingHref(null);
+          if (target) router.push(target);
+        }}
+      />
       </div>
     </section>
   );
