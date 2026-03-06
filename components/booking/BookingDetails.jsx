@@ -31,6 +31,39 @@ export default function BookingDetails({
   selectedPackage = '',
   selectedHours = '',
 }) {
+  // Autofill contact info from account/profile once on mount
+  if (typeof window !== 'undefined' && !formData.__autofilled) {
+    try {
+      const accRaw = localStorage.getItem('tm_user');
+      const profRaw = localStorage.getItem('userProfile');
+      const acc = accRaw ? JSON.parse(accRaw) : null;
+      const prof = profRaw ? JSON.parse(profRaw) : null;
+      const next = { ...formData };
+      const fill = (key, ...candidates) => {
+        if (!next[key]) {
+          const val = candidates.find((v) => v && String(v).trim() !== '');
+          if (val !== undefined && val !== null) next[key] = val;
+        }
+      };
+      fill('full_name', prof?.fullName, acc?.name);
+      fill('ic_number', prof?.icNumber);
+      fill('phone', prof?.phoneNumber, acc?.phoneNumber);
+      fill('email', prof?.emailAddress, acc?.email);
+      fill('emergency_contact', prof?.emergencyContact);
+      if (
+        next.full_name ||
+        next.ic_number ||
+        next.phone ||
+        next.email ||
+        next.emergency_contact
+      ) {
+        next.__autofilled = true;
+        onFormChange(next);
+      }
+    } catch {
+      // ignore JSON parse errors
+    }
+  }
   // Handle input change
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;

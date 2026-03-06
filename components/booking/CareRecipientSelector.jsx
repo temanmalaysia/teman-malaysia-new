@@ -5,7 +5,7 @@
  */
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { FaUser, FaUserPlus, FaInfoCircle } from 'react-icons/fa';
 
 const MAX_RECIPIENTS = 3;
@@ -22,6 +22,16 @@ const languageOptions = [
   { value: 'tamil', label: 'Tamil' },
   { value: 'other', label: 'Other' },
 ];
+
+const normalizeLanguage = (val) => {
+  if (!val) return '';
+  const s = String(val).toLowerCase().trim();
+  if (['english', 'en'].includes(s)) return 'english';
+  if (['malay', 'bahasa', 'bahasa malaysia', 'bm', 'melayu'].includes(s)) return 'bahasa';
+  if (['mandarin', 'chinese', 'cina', 'zh'].includes(s)) return 'mandarin';
+  if (['tamil'].includes(s)) return 'tamil';
+  return 'other';
+};
 
 // Helper function to get saved recipients from localStorage
 const getSavedRecipients = () => {
@@ -40,7 +50,7 @@ export default function CareRecipientSelector({
   theme = 'health' 
 }) {
   // Initialize state directly from localStorage (no useEffect needed)
-  const [savedRecipients] = useState(getSavedRecipients);
+  const [savedRecipients, setSavedRecipients] = useState(getSavedRecipients);
   const [selectedRecipientIndex, setSelectedRecipientIndex] = useState('');
   
   // Determine initial mode based on saved recipients count
@@ -48,6 +58,21 @@ export default function CareRecipientSelector({
     const recipients = getSavedRecipients();
     return recipients.length >= MAX_RECIPIENTS ? 'select' : 'manual';
   });
+
+  useEffect(() => {
+    const refresh = () => setSavedRecipients(getSavedRecipients());
+    const storageListener = (e) => {
+      if (!e || !e.key || e.key === 'careRecipients' || e.key.startsWith('tm_')) {
+        refresh();
+      }
+    };
+    window.addEventListener('storage', storageListener);
+    window.addEventListener('tm:auth', refresh);
+    return () => {
+      window.removeEventListener('storage', storageListener);
+      window.removeEventListener('tm:auth', refresh);
+    };
+  }, []);
 
   // Check if user has reached max recipients
   const hasMaxRecipients = savedRecipients.length >= MAX_RECIPIENTS;
@@ -67,6 +92,8 @@ export default function CareRecipientSelector({
       patient_language: '',
       patient_weight: '',
       patient_height: '',
+      medical_conditions: '',
+      special_requirements: '',
     });
   };
 
@@ -85,6 +112,8 @@ export default function CareRecipientSelector({
         patient_language: '',
         patient_weight: '',
         patient_height: '',
+        medical_conditions: '',
+        special_requirements: '',
       });
     } else {
       // Fill form with selected recipient data
@@ -94,9 +123,11 @@ export default function CareRecipientSelector({
         patient_name: recipient.name || '',
         patient_age: recipient.age || '',
         patient_gender: recipient.gender || '',
-        patient_language: recipient.preferredLanguage || '',
+        patient_language: normalizeLanguage(recipient.preferredLanguage || recipient.language),
         patient_weight: recipient.weight || '',
         patient_height: recipient.height || '',
+        medical_conditions: recipient.medicalConditions || '',
+        special_requirements: recipient.specialRequirements || '',
       });
     }
   };
@@ -116,7 +147,7 @@ export default function CareRecipientSelector({
   return (
     <div className={`care-recipient-selector ${themeClass}`}>
       {/* Mode Selection - Only show if user has saved recipients but not max */}
-      {/* {hasSavedRecipients && !hasMaxRecipients && (
+      {hasSavedRecipients && !hasMaxRecipients && (
         <div className="care-recipient-selector__mode-toggle">
           <button
             type="button"
@@ -135,7 +166,7 @@ export default function CareRecipientSelector({
             <span>Enter manually</span>
           </button>
         </div>
-      )} */}
+      )}
 
       {/* Info message when max recipients reached */}
       {hasMaxRecipients && (
@@ -292,14 +323,14 @@ export default function CareRecipientSelector({
       </div>
 
       {/* No saved recipients message */}
-      {/* {!hasSavedRecipients && (
+      {!hasSavedRecipients && (
         <div className="care-recipient-selector__empty">
           <p>
             <strong>Tip:</strong> Save care recipients in your{' '}
             <Link href="/user">Profile Settings</Link> for faster booking next time.
           </p>
         </div>
-      )} */}
+      )}
     </div>
   );
 }

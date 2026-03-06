@@ -130,6 +130,10 @@ function User() {
       } catch {}
     };
     applyAccount();
+    const token = apiClient.auth.getToken ? apiClient.auth.getToken() : '';
+    if (token) {
+      apiClient.auth.me().catch(() => {});
+    }
     const onAuth = () => applyAccount();
     window.addEventListener('tm:auth', onAuth);
     return () => window.removeEventListener('tm:auth', onAuth);

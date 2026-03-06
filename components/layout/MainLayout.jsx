@@ -14,6 +14,9 @@ export default function MainLayout({ children }) {
     const currentUser = apiClient.auth.getUser();
     setIsSignedIn(loggedIn);
     setUser(currentUser);
+    if (loggedIn) {
+      apiClient.auth.me().catch(() => {});
+    }
   };
 
   useEffect(() => {

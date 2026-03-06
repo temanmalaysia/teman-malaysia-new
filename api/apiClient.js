@@ -20,6 +20,7 @@ const N8N_ENDPOINTS = {
   signup: '/api/auth/signup',
   login: '/api/auth/login',
   profile: '/api/user/profile',
+  me: '/api/user/me',
   booking: '/api/booking',
 };
 
@@ -178,6 +179,43 @@ const apiClient = {
     getToken: () => getToken(),
     isLoggedIn: () => !!getToken(),
     getUser: () => getUser(),
+    me: async () => {
+      const token = getToken();
+      if (!token) return { ok: false, data: null };
+      const res = await fetch(N8N_ENDPOINTS.me, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const json = await res.json().catch(() => ({}));
+      if (res.ok) {
+        const userPayload = json.user || json.data?.user || json;
+        if (userPayload) setUser(userPayload);
+        const recipients = json.careRecipients || json.data?.careRecipients || json.user?.careRecipients || [];
+        try {
+          if (Array.isArray(recipients)) {
+            localStorage.setItem('careRecipients', JSON.stringify(recipients));
+            window.dispatchEvent(new Event('tm:auth'));
+          }
+        } catch {}
+        const profile = {
+          fullName: userPayload?.fullname || userPayload?.name || '',
+          icNumber: userPayload?.icNumber || '',
+          phoneNumber: userPayload?.phoneNumber || userPayload?.phone || '',
+          emailAddress: userPayload?.email || userPayload?.emailAddress || '',
+          emergencyContact: userPayload?.emergencyContact || '',
+        };
+        try {
+          const existing = localStorage.getItem('userProfile');
+          const merged = { ...(existing ? JSON.parse(existing) : {}), ...profile };
+          localStorage.setItem('userProfile', JSON.stringify(merged));
+          window.dispatchEvent(new Event('tm:auth'));
+        } catch {}
+      }
+      return { ok: res.ok, data: json };
+    },
     updateProfile: async ({ profile, recipients = [] }) => {
       const token = getToken();
       const body = {
