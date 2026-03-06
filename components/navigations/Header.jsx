@@ -64,7 +64,8 @@ export default function Header({ isSignedIn = false, user = null, onLogout }) {
     return (words[0][0] + words[words.length - 1][0]).toUpperCase();
   };
 
-  const userInitials = getInitials(user?.name);
+  const displayName = user?.name || user?.fullname || user?.fullName || '';
+  const userInitials = getInitials(displayName);
 
   const userButton = (
     <button
@@ -78,7 +79,7 @@ export default function Header({ isSignedIn = false, user = null, onLogout }) {
       {user?.avatar ? (
         <Image 
           src={user.avatar} 
-          alt={user.name || 'User'} 
+          alt={displayName || 'User'} 
           width={40} 
           height={40} 
           className="nav__user-avatar"
@@ -94,8 +95,8 @@ export default function Header({ isSignedIn = false, user = null, onLogout }) {
   const dropdownMenu = isDropdownOpen && (
     <div className="nav__dropdown-menu" role="menu">
       <div className="nav__dropdown-header">
-        {user?.name && <span className="nav__dropdown-name">{user.name}</span>}
-        {user?.email && <span className="nav__dropdown-email">{user.email}</span>}
+        {displayName && <span className="nav__dropdown-name">{displayName}</span>}
+        {(user?.email || user?.emailAddress) && <span className="nav__dropdown-email">{user?.email || user?.emailAddress}</span>}
       </div>
       <div className="nav__dropdown-divider" />
       <Link 

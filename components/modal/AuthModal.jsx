@@ -2,6 +2,7 @@ import { useEffect, useCallback, useState, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import { FaEye, FaEyeSlash, FaEnvelope, FaLock, FaTimes, FaUser, FaPhone, FaCheck, FaGoogle, FaApple } from 'react-icons/fa';
+import apiClient from '@/api/apiClient';
 
 // Password validation helper
 const validatePassword = (password) => {
@@ -33,6 +34,10 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'signin', onS
   // Common state
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState({});
+  const [apiError, setApiError] = useState('');
+  const [apiSuccess, setApiSuccess] = useState('');
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
 
   // Password validation
   const passwordChecks = useMemo(() => validatePassword(password), [password]);
@@ -71,6 +76,8 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'signin', onS
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrors({});
+    setApiError('');
+    setApiSuccess('');
 
     // Validation
     const newErrors = {};
@@ -92,16 +99,44 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'signin', onS
     }
 
     setIsLoading(true);
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    setIsLoading(false);
     try {
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('tm_signed_in', '1');
+      if (isSignUp) {
+        const result = await apiClient.auth.signup({
+          fullname: fullName,
+          phoneNumber,
+          email,
+          password,
+        });
+        const msg =
+          (result?.data && (result.data.message || result.data.msg || result.data.error)) ||
+          '';
+        if (!result.ok) {
+          setIsLoading(false);
+          setApiError(msg || 'Sign up failed');
+          return;
+        }
+        setIsLoading(false);
+        setSuccessMessage(msg || 'Sign up successful');
+        setShowSuccessModal(true);
+        return;
+      } else {
+        const result = await apiClient.auth.login(email, password);
+        const msg =
+          (result?.data && (result.data.message || result.data.msg || result.data.error)) ||
+          '';
+        if (!result.ok || !result.token) {
+          setIsLoading(false);
+          setApiError(msg || 'Invalid email or password');
+          return;
+        }
       }
-    } catch {}
-    if (onSuccess) onSuccess();
-    else onClose();
+      setIsLoading(false);
+      if (onSuccess) onSuccess();
+      else onClose();
+    } catch {
+      setIsLoading(false);
+      setApiError('Authentication error');
+    }
   };
 
   if (!isOpen) return null;
@@ -162,6 +197,8 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'signin', onS
 
           {/* Form */}
           <form className="auth-modal__form" onSubmit={handleSubmit} noValidate>
+            {apiError && <div className="auth-modal__error" aria-live="polite">{apiError}</div>}
+            {!isSignUp && apiSuccess && <div className="auth-modal__success" aria-live="polite">{apiSuccess}</div>}
             {/* Sign Up Fields */}
             {isSignUp && (
               <>
@@ -404,8 +441,50 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'signin', onS
     </div>
   );
 
-  if (typeof window !== 'undefined') {
-    return createPortal(modalContent, document.body);
-  }
-  return null;
+  const successModalContent = (
+    <div
+      id="auth-success-modal"
+      className="auth-modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="auth-success-title"
+    >
+      <div className="auth-modal__backdrop">
+        <div className="auth-modal__content">
+          <button 
+            className="auth-modal__close" 
+            onClick={() => {
+              setShowSuccessModal(false);
+              if (onSuccess) onSuccess();
+              else onClose();
+            }}
+            aria-label="Close modal"
+            type="button"
+          >
+            <FaTimes />
+          </button>
+          <div className="auth-modal__header">
+            <h2 id="auth-success-title" className="auth-modal__title">Sign Up Successful</h2>
+            <p className="auth-modal__subtitle">{successMessage}</p>
+          </div>
+          <div className="auth-modal__form">
+            <button
+              type="button"
+              className="auth-modal__submit"
+              onClick={() => {
+                setShowSuccessModal(false);
+                if (onSuccess) onSuccess();
+                else onClose();
+              }}
+            >
+              Continue
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  if (typeof window === 'undefined') return null;
+  return createPortal(showSuccessModal ? successModalContent : modalContent, document.body);
 }

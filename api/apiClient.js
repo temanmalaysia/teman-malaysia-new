@@ -16,6 +16,13 @@ const FORMSPREE_URLS = {
 
 const PAYMENT_URL = 'https://www.billplz.com/deposit4Teman';
 
+const N8N_ENDPOINTS = {
+  signup: '/api/auth/signup',
+  login: '/api/auth/login',
+  profile: '/api/user/profile',
+  booking: '/api/booking',
+};
+
 /**
  * Generate booking reference number
  * Format: TM + last 6 digits of timestamp (e.g., TM125139)
@@ -35,6 +42,60 @@ function formatServiceType(type) {
     homePackage: 'Home Care Package',
   };
   return serviceNames[type] || type || 'Unknown';
+}
+
+function setToken(token) {
+  try {
+    if (typeof window !== 'undefined') {
+      if (token) {
+        localStorage.setItem('tm_token', token);
+        localStorage.setItem('tm_signed_in', '1');
+      } else {
+        localStorage.removeItem('tm_token');
+        localStorage.removeItem('tm_signed_in');
+      }
+      try {
+        window.dispatchEvent(new Event('tm:auth'));
+      } catch {}
+    }
+  } catch {}
+}
+
+function getToken() {
+  try {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('tm_token') || '';
+    }
+  } catch {}
+  return '';
+}
+
+function setUser(user) {
+  try {
+    if (typeof window !== 'undefined' && user) {
+      const normalized = {
+        uid: user.uid || user.id || '',
+        email: user.email || user.emailAddress || '',
+        name: user.name || user.fullname || user.fullName || '',
+        phoneNumber: user.phoneNumber || user.phone || '',
+        avatar: user.avatar || '',
+      };
+      localStorage.setItem('tm_user', JSON.stringify(normalized));
+      try {
+        window.dispatchEvent(new Event('tm:auth'));
+      } catch {}
+    }
+  } catch {}
+}
+
+function getUser() {
+  try {
+    if (typeof window !== 'undefined') {
+      const raw = localStorage.getItem('tm_user');
+      return raw ? JSON.parse(raw) : null;
+    }
+  } catch {}
+  return null;
 }
 
 /**
@@ -66,6 +127,89 @@ function toURLParams(data) {
 }
 
 const apiClient = {
+  auth: {
+    signup: async (data) => {
+      const body = {
+        fullname: data.fullname || data.fullName || '',
+        icNumber: data.icNumber || '',
+        phoneNumber: data.phoneNumber || '',
+        email: data.email,
+        password: data.password,
+      };
+      const res = await fetch(N8N_ENDPOINTS.signup, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      const json = await res.json().catch(() => ({}));
+      const token = json.token || json.accessToken || (json.data && json.data.token) || '';
+      if (token) setToken(token);
+      if (json.user || (json.data && json.data.user)) {
+        setUser(json.user || json.data.user);
+      }
+      return { ok: res.ok, token, data: json };
+    },
+    login: async (email, password) => {
+      const res = await fetch(N8N_ENDPOINTS.login, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+      const json = await res.json().catch(() => ({}));
+      const token = json.token || json.accessToken || (json.data && json.data.token) || '';
+      if (token) setToken(token);
+      if (json.user || (json.data && json.data.user)) {
+        setUser(json.user || json.data.user);
+      }
+      return { ok: res.ok, token, data: json };
+    },
+    logout: () => {
+      setToken('');
+      try {
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('tm_user');
+        }
+      } catch {}
+      try {
+        window.dispatchEvent(new Event('tm:auth'));
+      } catch {}
+      return { ok: true };
+    },
+    getToken: () => getToken(),
+    isLoggedIn: () => !!getToken(),
+    getUser: () => getUser(),
+    updateProfile: async ({ profile, recipients = [] }) => {
+      const token = getToken();
+      const body = {
+        fullname: profile.fullName || '',
+        icNumber: profile.icNumber || '',
+        phoneNumber: profile.phoneNumber || '',
+        email: profile.emailAddress || profile.email || '',
+        emergencyContact: profile.emergencyContact || '',
+        careRecipients: recipients.map((r) => ({
+          name: r.name || '',
+          age: r.age ? Number(r.age) : r.age,
+          gender: r.gender || '',
+          preferredLanguage: r.preferredLanguage || r.language || '',
+          weight: r.weight ? Number(r.weight) : r.weight,
+          height: r.height ? Number(r.height) : r.height,
+          address: r.address || '',
+          medicalConditions: r.medicalConditions || '',
+          specialRequirements: r.specialRequirements || '',
+        })),
+      };
+      const res = await fetch(N8N_ENDPOINTS.profile, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify(body),
+      });
+      const json = await res.json().catch(() => ({}));
+      return { ok: res.ok, data: json };
+    },
+  },
   booking: {
     /**
      * Submit booking to Google Sheets via Apps Script + Formspree for email
@@ -403,6 +547,53 @@ const apiClient = {
             window.location.href = PAYMENT_URL;
           }, redirectDelay);
         }
+
+        try {
+          const pick = (src, key, alt = []) => src[key] || alt.map((k) => src[k]).find((v) => !!v) || '';
+          const payload = {};
+          payload.serviceType = pick(enrichedData, 'service_type');
+          payload.packageType = pick(enrichedData, 'package');
+          payload.hours = pick(enrichedData, 'selected_hours', ['hours']);
+          payload.estimatedCost = pick(enrichedData, 'estimated_cost', ['package_cost']);
+          payload.fullname = pick(enrichedData, 'full_name');
+          payload.icNumber = pick(enrichedData, 'ic_number');
+          payload.phoneNumber = pick(enrichedData, 'phone');
+          payload.email = pick(enrichedData, 'email');
+          payload.employer = pick(enrichedData, 'employer');
+          payload.staffId = pick(enrichedData, 'staff_id');
+          payload.emergencyContact = pick(enrichedData, 'emergency_contact');
+          payload.patientName = pick(enrichedData, 'patient_name');
+          payload.patientAge = pick(enrichedData, 'patient_age');
+          payload.patientGender = pick(enrichedData, 'patient_gender');
+          payload.patientLanguage = pick(enrichedData, 'patient_language');
+          payload.patientWeight = pick(enrichedData, 'patient_weight');
+          payload.patientHeight = pick(enrichedData, 'patient_height');
+          payload.appointmentDates = pick(enrichedData, 'appointment_dates', ['multi_dates', 'care_dates', 'activity_dates']);
+          payload.appointmentType = pick(enrichedData, 'appointment_type');
+          payload.doctorName = pick(enrichedData, 'doctor_name');
+          payload.appointmentTime = pick(enrichedData, 'appointment_time', ['preferred_start_time', 'activity_time']);
+          payload.estimatedDuration = pick(enrichedData, 'appointment_duration', ['session_duration', 'duration']);
+          payload.facilityAddress = pick(enrichedData, 'facility_address', ['center_address']);
+          payload.pickupAddress = pick(enrichedData, 'pickup_address', ['meeting_address']);
+          payload.returnAddress = pick(enrichedData, 'return_address');
+          payload.pickupTime = pick(enrichedData, 'pickup_time');
+          payload.transportationMode = pick(enrichedData, 'transportation_mode');
+          payload.transportationNotes = pick(enrichedData, 'transportation_notes');
+          payload.medicalConditions = pick(enrichedData, 'medical_conditions', ['health_conditions']);
+          payload.medications = pick(enrichedData, 'medications');
+          payload.mobilityAssistance = pick(enrichedData, 'mobility_assistance', ['mobility_level']);
+          payload.specialRequirements = pick(enrichedData, 'special_requirements');
+          payload.companionGender = pick(enrichedData, 'companion_gender');
+          payload.companionLanguage = pick(enrichedData, 'companion_language');
+          payload.additionalNotes = pick(enrichedData, 'additional_notes');
+          payload.howHeard = pick(enrichedData, 'how_heard');
+          const compact = Object.fromEntries(Object.entries(payload).filter(([, v]) => v !== undefined && v !== null && v !== ''));
+          await fetch(N8N_ENDPOINTS.booking, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(compact),
+          }).catch(() => {});
+        } catch {}
 
         return { 
           ok: true, 

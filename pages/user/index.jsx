@@ -3,6 +3,7 @@ import dynamic from 'next/dynamic';
 import MainLayout from '@/components/layout/MainLayout';
 import { FaPlus, FaTrash, FaUser, FaUsers, FaCheck, FaExclamationCircle } from 'react-icons/fa';
 import Head from 'next/head';
+import apiClient from '@/api/apiClient';
 
 const genderOptions = [
   { value: '', label: 'Select gender' },
@@ -34,12 +35,25 @@ function User() {
     if (typeof window === 'undefined') return defaultProfile;
     try {
       const stored = localStorage.getItem('userProfile');
+      const accRaw = localStorage.getItem('tm_user');
+      const acc = accRaw ? JSON.parse(accRaw) : null;
       if (stored) {
         const parsed = JSON.parse(stored);
         const { address, ...rest } = parsed;
-        return { ...defaultProfile, ...rest };
+        return {
+          ...defaultProfile,
+          ...rest,
+          fullName: rest.fullName || acc?.name || '',
+          phoneNumber: rest.phoneNumber || acc?.phoneNumber || '',
+          emailAddress: rest.emailAddress || acc?.email || '',
+        };
       }
-      return defaultProfile;
+      return {
+        ...defaultProfile,
+        fullName: acc?.name || '',
+        phoneNumber: acc?.phoneNumber || '',
+        emailAddress: acc?.email || '',
+      };
     } catch {
       return defaultProfile;
     }
@@ -49,12 +63,25 @@ function User() {
     if (typeof window === 'undefined') return defaultProfile;
     try {
       const stored = localStorage.getItem('userProfile');
+      const accRaw = localStorage.getItem('tm_user');
+      const acc = accRaw ? JSON.parse(accRaw) : null;
       if (stored) {
         const parsed = JSON.parse(stored);
         const { address, ...rest } = parsed;
-        return { ...defaultProfile, ...rest };
+        return {
+          ...defaultProfile,
+          ...rest,
+          fullName: rest.fullName || acc?.name || '',
+          phoneNumber: rest.phoneNumber || acc?.phoneNumber || '',
+          emailAddress: rest.emailAddress || acc?.email || '',
+        };
       }
-      return defaultProfile;
+      return {
+        ...defaultProfile,
+        fullName: acc?.name || '',
+        phoneNumber: acc?.phoneNumber || '',
+        emailAddress: acc?.email || '',
+      };
     } catch {
       return defaultProfile;
     }
@@ -81,6 +108,32 @@ function User() {
   });
 
   const [message, setMessage] = useState({ type: '', text: '' });
+
+  // Refresh from account on auth changes
+  useEffect(() => {
+    const applyAccount = () => {
+      try {
+        const acc = apiClient.auth.getUser ? apiClient.auth.getUser() : null;
+        if (!acc) return;
+        setProfile((prev) => ({
+          ...prev,
+          fullName: prev.fullName || acc.name || '',
+          phoneNumber: prev.phoneNumber || acc.phoneNumber || '',
+          emailAddress: prev.emailAddress || acc.email || '',
+        }));
+        setSavedProfile((prev) => ({
+          ...prev,
+          fullName: prev.fullName || acc.name || '',
+          phoneNumber: prev.phoneNumber || acc.phoneNumber || '',
+          emailAddress: prev.emailAddress || acc.email || '',
+        }));
+      } catch {}
+    };
+    applyAccount();
+    const onAuth = () => applyAccount();
+    window.addEventListener('tm:auth', onAuth);
+    return () => window.removeEventListener('tm:auth', onAuth);
+  }, []);
 
   // Check if profile is complete (all required fields filled)
   const isProfileComplete = useMemo(() => {
@@ -114,7 +167,7 @@ function User() {
     setProfile((prev) => ({ ...prev, [name]: value }));
   };
 
-  const saveProfile = (e) => {
+  const saveProfile = async (e) => {
     e.preventDefault();
     setMessage({ type: '', text: '' });
     if (!profile.fullName.trim()) return setMessage({ type: 'error', text: 'Full Name is required.' });
@@ -124,7 +177,33 @@ function User() {
       const { address, ...cleanProfile } = profile;
       localStorage.setItem('userProfile', JSON.stringify(cleanProfile));
       setSavedProfile(cleanProfile);
-      setMessage({ type: 'success', text: 'Profile saved successfully.' });
+      const token = apiClient.auth.getToken();
+      if (token) {
+        const res = await apiClient.auth.updateProfile({
+          profile: cleanProfile,
+          recipients,
+        });
+        if (!res.ok) {
+          setMessage({ type: 'error', text: 'Profile saved locally, but failed to sync.' });
+          return;
+        }
+        // Update header user cache if name/email/phone changed
+        try {
+          const raw = localStorage.getItem('tm_user');
+          if (raw) {
+            const u = JSON.parse(raw);
+            const next = {
+              ...u,
+              name: cleanProfile.fullName || u.name,
+              email: cleanProfile.emailAddress || u.email,
+              phoneNumber: cleanProfile.phoneNumber || u.phoneNumber,
+            };
+            localStorage.setItem('tm_user', JSON.stringify(next));
+            window.dispatchEvent(new Event('tm:auth'));
+          }
+        } catch {}
+      }
+      setMessage({ type: 'success', text: token ? 'Profile saved & synced.' : 'Profile saved successfully.' });
     } catch {
       setMessage({ type: 'error', text: 'Unable to save profile.' });
     }
