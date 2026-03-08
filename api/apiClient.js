@@ -227,10 +227,39 @@ const apiClient = {
       if (res.ok) {
         const userPayload = json.user || json.data?.user || json;
         if (userPayload) setUser(userPayload);
-        const recipients = json.careRecipients || json.data?.careRecipients || json.user?.careRecipients || [];
+        const recipients =
+          json.careRecipients ||
+          json.recipients ||
+          json.data?.careRecipients ||
+          json.data?.recipients ||
+          json.user?.careRecipients ||
+          json.user?.recipients ||
+          [];
         try {
           if (Array.isArray(recipients)) {
-            localStorage.setItem('careRecipients', JSON.stringify(recipients));
+            const normalized = recipients.map((r) => ({
+              name: r.name || '',
+              age: r.age ?? '',
+              gender: r.gender || '',
+              preferredLanguage: r.preferredLanguage || r.language || '',
+              weight: r.weight ?? '',
+              height: r.height ?? '',
+              address: r.address || '',
+              posscode:
+                r.posscode ||
+                r.postcode ||
+                r.post_code ||
+                r.zip_code ||
+                r.zip ||
+                '',
+              city: r.city || r.area_city || r.area || '',
+              accessInformation:
+                r.accessInformation || r.homeAccessInfo || r.access || '',
+              medicalConditions: r.medicalConditions || r.healthConditions || '',
+              specialRequirements:
+                r.specialRequirements || r.requirements || '',
+            }));
+            localStorage.setItem('careRecipients', JSON.stringify(normalized));
             window.dispatchEvent(new Event('tm:auth'));
           }
         } catch {}
@@ -272,6 +301,9 @@ const apiClient = {
           weight: r.weight ? Number(r.weight) : r.weight,
           height: r.height ? Number(r.height) : r.height,
           address: r.address || '',
+          posscode: r.posscode || r.postcode || '',
+          city: r.city || '',
+          accessInformation: r.accessInformation || r.homeAccessInfo || '',
           medicalConditions: r.medicalConditions || '',
           specialRequirements: r.specialRequirements || '',
         })),

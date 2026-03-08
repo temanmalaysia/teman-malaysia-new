@@ -136,6 +136,11 @@ function User() {
           const raw = localStorage.getItem("userProfile");
           prof = raw ? JSON.parse(raw) : null;
         } catch {}
+        const deriveNameFromEmail = (em) => {
+          if (!em || typeof em !== "string") return "";
+          const local = em.split("@")[0] || "";
+          return local.replace(/[._-]+/g, " ").trim();
+        };
         const pick = (prevVal, ...candidates) => {
           if (prevVal && String(prevVal).trim() !== "") return prevVal;
           const found = candidates.find(
@@ -143,9 +148,12 @@ function User() {
           );
           return found ?? "";
         };
+        const fallbackName =
+          pick("", acc?.name, prof?.fullName) ||
+          deriveNameFromEmail(acc?.email || prof?.emailAddress || "");
         setProfile((prev) => ({
           ...prev,
-          fullName: pick(prev.fullName, acc?.name, prof?.fullName),
+          fullName: pick(prev.fullName, acc?.name, prof?.fullName, fallbackName),
           icNumber: pick(prev.icNumber, acc?.icNumber, prof?.icNumber),
           phoneNumber: pick(
             prev.phoneNumber,
@@ -161,7 +169,7 @@ function User() {
         }));
         setSavedProfile((prev) => ({
           ...prev,
-          fullName: pick(prev.fullName, acc?.name, prof?.fullName),
+          fullName: pick(prev.fullName, acc?.name, prof?.fullName, fallbackName),
           icNumber: pick(prev.icNumber, acc?.icNumber, prof?.icNumber),
           phoneNumber: pick(
             prev.phoneNumber,
@@ -175,6 +183,17 @@ function User() {
             prof?.emergencyContact,
           ),
         }));
+        // Rehydrate care recipients from storage (populated by ME)
+        try {
+          const careRaw = localStorage.getItem("careRecipients");
+          if (careRaw) {
+            const arr = JSON.parse(careRaw);
+            if (Array.isArray(arr)) {
+              setRecipients(arr);
+              setSavedRecipients(arr);
+            }
+          }
+        } catch {}
       } catch {}
     };
     applyAccount();
@@ -320,10 +339,42 @@ function User() {
     try {
       localStorage.setItem("careRecipients", JSON.stringify(recipients));
       setSavedRecipients(recipients);
-      setMessage({
-        type: "success",
-        text: "Care recipients saved successfully.",
-      });
+      const token = apiClient.auth.getToken ? apiClient.auth.getToken() : "";
+      if (token) {
+        apiClient.auth
+          .updateProfile({
+            profile: savedProfile,
+            recipients,
+          })
+          .then(async (res) => {
+            if (!res.ok) {
+              setMessage({
+                type: "error",
+                text:
+                  "Recipients saved locally, but failed to sync with server.",
+              });
+              return;
+            }
+            try {
+              await apiClient.auth.me();
+            } catch {}
+            setMessage({
+              type: "success",
+              text: "Care recipients saved & synced.",
+            });
+          })
+          .catch(() => {
+            setMessage({
+              type: "error",
+              text: "Recipients saved locally, but failed to sync with server.",
+            });
+          });
+      } else {
+        setMessage({
+          type: "success",
+          text: "Care recipients saved locally.",
+        });
+      }
     } catch {
       setMessage({ type: "error", text: "Unable to save care recipients." });
     }

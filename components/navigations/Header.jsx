@@ -117,7 +117,7 @@ export default function Header({ isSignedIn = false, user = null, onLogout }) {
         <FaUserCircle className="nav__dropdown-icon" />
         <span>Profile</span>
       </Link>
-      <Link
+      {/* <Link
         href="/auth/change-password"
         className="nav__dropdown-item"
         role="menuitem"
@@ -128,7 +128,7 @@ export default function Header({ isSignedIn = false, user = null, onLogout }) {
       >
         <FaKey className="nav__dropdown-icon" />
         <span>Change Password</span>{" "}
-      </Link>
+      </Link> */}
       <button
         type="button"
         className="nav__dropdown-item nav__dropdown-item--logout"
