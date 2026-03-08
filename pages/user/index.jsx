@@ -142,6 +142,11 @@ function User() {
           const local = em.split("@")[0] || "";
           return local.replace(/[._-]+/g, " ").trim();
         };
+        const toTitleCase = (s) => {
+          if (!s || typeof s !== "string") return s || "";
+          const lower = s.toLowerCase();
+          return lower.replace(/\b\w/g, (m) => m.toUpperCase());
+        };
         const pick = (prevVal, ...candidates) => {
           if (prevVal && String(prevVal).trim() !== "") return prevVal;
           const found = candidates.find(
@@ -154,7 +159,9 @@ function User() {
           deriveNameFromEmail(acc?.email || prof?.emailAddress || "");
         setProfile((prev) => ({
           ...prev,
-          fullName: pick(prev.fullName, acc?.name, prof?.fullName, fallbackName),
+          fullName: toTitleCase(
+            pick(prev.fullName, acc?.name, prof?.fullName, fallbackName),
+          ),
           icNumber: pick(prev.icNumber, acc?.icNumber, prof?.icNumber),
           phoneNumber: pick(
             prev.phoneNumber,
@@ -170,7 +177,9 @@ function User() {
         }));
         setSavedProfile((prev) => ({
           ...prev,
-          fullName: pick(prev.fullName, acc?.name, prof?.fullName, fallbackName),
+          fullName: toTitleCase(
+            pick(prev.fullName, acc?.name, prof?.fullName, fallbackName),
+          ),
           icNumber: pick(prev.icNumber, acc?.icNumber, prof?.icNumber),
           phoneNumber: pick(
             prev.phoneNumber,

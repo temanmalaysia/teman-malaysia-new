@@ -73,6 +73,24 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'signin', onS
     setShowConfirmPassword(false);
   };
 
+  // Ensure Sign In is the default whenever modal opens (deferred to avoid sync setState in effect)
+  useEffect(() => {
+    if (!isOpen) return;
+    const reset = () => {
+      setMode('signin');
+      setErrors({});
+      setApiError('');
+      setApiSuccess('');
+      setPassword('');
+      setConfirmPassword('');
+      setShowPassword(false);
+      setShowConfirmPassword(false);
+      setAgreeToTerms(false);
+    };
+    const t = setTimeout(reset, 0);
+    return () => clearTimeout(t);
+  }, [isOpen]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrors({});
@@ -369,9 +387,9 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'signin', onS
                   <span className="auth-modal__checkbox-custom"></span>
                   <span className="auth-modal__checkbox-label">Remember me</span>
                 </label>
-                <Link href="/auth/reset-password" className="auth-modal__forgot">
+                {/* <Link href="/auth/reset-password" className="auth-modal__forgot">
                   Forgot password?
-                </Link>
+                </Link> */}
               </div>
             )}
 
