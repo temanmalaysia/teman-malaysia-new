@@ -294,7 +294,7 @@ function User() {
         weight: "",
         height: "",
         address: "",
-        postcode: "",
+        posscode: "",
         city: "",
         medicalConditions: "",
         specialRequirements: "",
@@ -568,7 +568,7 @@ function User() {
                         >
                           <div className="user-profile__recipient-header">
                             <span className="user-profile__recipient-number">
-                              Recipient {index + 1}
+                              {r.name && String(r.name).trim() ? String(r.name).trim() : `Recipient ${index + 1}`}
                             </span>
                             <button
                               type="button"
@@ -732,11 +732,11 @@ function User() {
                                 type="text"
                                 className="user-profile__input"
                                 placeholder="Postcode"
-                                value={r.postcode}
+                                value={r.posscode}
                                 onChange={(e) =>
                                   updateRecipient(
                                     index,
-                                          "postcode",
+                                          "posscode",
                                     e.target.value,
                                   )
                                 }
