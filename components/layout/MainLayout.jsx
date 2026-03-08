@@ -9,24 +9,29 @@ export default function MainLayout({ children }) {
   const [isSignedIn, setIsSignedIn] = useState(false);
   const [user, setUser] = useState(null);
 
-  const refreshAuth = () => {
+  const updateFromAuth = () => {
     const loggedIn = apiClient.auth.isLoggedIn();
     const currentUser = apiClient.auth.getUser();
     setIsSignedIn(loggedIn);
     setUser(currentUser);
-    if (loggedIn) {
-      apiClient.auth.me().catch(() => {});
-    }
   };
 
   useEffect(() => {
-    refreshAuth();
-    const onAuth = () => refreshAuth();
+    const onAuth = () => updateFromAuth();
     const onStorage = (e) => {
-      if (!e || !e.key || e.key.startsWith("tm_")) refreshAuth();
+      if (!e || !e.key || e.key.startsWith("tm_")) updateFromAuth();
     };
     window.addEventListener("tm:auth", onAuth);
     window.addEventListener("storage", onStorage);
+    // Initial client-side auth state sync after mount to avoid hydration mismatch.
+    setTimeout(() => {
+      updateFromAuth();
+      try {
+        if (apiClient.auth.isLoggedIn()) {
+          apiClient.auth.me().catch(() => {});
+        }
+      } catch {}
+    }, 0);
     return () => {
       window.removeEventListener("tm:auth", onAuth);
       window.removeEventListener("storage", onStorage);
@@ -53,17 +58,17 @@ export default function MainLayout({ children }) {
 
   const handleLogout = () => {
     apiClient.auth.logout();
-    refreshAuth();
+    updateFromAuth();
     if (router.pathname.startsWith("/user")) {
       router.push("/");
     }
   };
 
   return (
-    <>
+    <div className="app-shell">
       <Header isSignedIn={isSignedIn} user={user} onLogout={handleLogout} />
-      {children}
+      <main className="app-main">{children}</main>
       <Footer />
-    </>
+    </div>
   );
 }

@@ -113,19 +113,40 @@ function User() {
   useEffect(() => {
     const applyAccount = () => {
       try {
+        const loggedIn = apiClient.auth.isLoggedIn ? apiClient.auth.isLoggedIn() : false;
+        if (!loggedIn) {
+          setProfile({ ...defaultProfile });
+          setSavedProfile({ ...defaultProfile });
+          setRecipients([]);
+          setSavedRecipients([]);
+          return;
+        }
         const acc = apiClient.auth.getUser ? apiClient.auth.getUser() : null;
-        if (!acc) return;
+        let prof = null;
+        try {
+          const raw = localStorage.getItem('userProfile');
+          prof = raw ? JSON.parse(raw) : null;
+        } catch {}
+        const pick = (prevVal, ...candidates) => {
+          if (prevVal && String(prevVal).trim() !== '') return prevVal;
+          const found = candidates.find((v) => v !== undefined && v !== null && String(v).trim() !== '');
+          return found ?? '';
+        };
         setProfile((prev) => ({
           ...prev,
-          fullName: prev.fullName || acc.name || '',
-          phoneNumber: prev.phoneNumber || acc.phoneNumber || '',
-          emailAddress: prev.emailAddress || acc.email || '',
+          fullName: pick(prev.fullName, acc?.name, prof?.fullName),
+          icNumber: pick(prev.icNumber, acc?.icNumber, prof?.icNumber),
+          phoneNumber: pick(prev.phoneNumber, acc?.phoneNumber, prof?.phoneNumber),
+          emailAddress: pick(prev.emailAddress, acc?.email, prof?.emailAddress),
+          emergencyContact: pick(prev.emergencyContact, acc?.emergencyContact, prof?.emergencyContact),
         }));
         setSavedProfile((prev) => ({
           ...prev,
-          fullName: prev.fullName || acc.name || '',
-          phoneNumber: prev.phoneNumber || acc.phoneNumber || '',
-          emailAddress: prev.emailAddress || acc.email || '',
+          fullName: pick(prev.fullName, acc?.name, prof?.fullName),
+          icNumber: pick(prev.icNumber, acc?.icNumber, prof?.icNumber),
+          phoneNumber: pick(prev.phoneNumber, acc?.phoneNumber, prof?.phoneNumber),
+          emailAddress: pick(prev.emailAddress, acc?.email, prof?.emailAddress),
+          emergencyContact: pick(prev.emergencyContact, acc?.emergencyContact, prof?.emergencyContact),
         }));
       } catch {}
     };
@@ -191,6 +212,9 @@ function User() {
           setMessage({ type: 'error', text: 'Profile saved locally, but failed to sync.' });
           return;
         }
+        try {
+          await apiClient.auth.me();
+        } catch {}
         // Update header user cache if name/email/phone changed
         try {
           const raw = localStorage.getItem('tm_user');
@@ -366,8 +390,8 @@ function User() {
                         placeholder="your.email@example.com"
                         value={profile.emailAddress}
                         onChange={handleProfileChange}
-                        required
                         data-testid="input-email-address"
+                        readOnly
                       />
                     </div>
                   </div>

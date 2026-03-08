@@ -21,6 +21,8 @@ const N8N_ENDPOINTS = {
   login: '/api/auth/login',
   profile: '/api/user/profile',
   me: '/api/user/me',
+  forgotPassword: '/api/auth/forgot-password',
+  changePassword: '/api/auth/change-password',
   booking: 'https://n8n-0faudat1jwfn.ciluba.sumopod.my.id/webhook-test/booking',
 };
 
@@ -74,12 +76,16 @@ function getToken() {
 function setUser(user) {
   try {
     if (typeof window !== 'undefined' && user) {
+      const existingRaw = localStorage.getItem('tm_user');
+      const existing = existingRaw ? JSON.parse(existingRaw) : {};
       const normalized = {
-        uid: user.uid || user.id || '',
-        email: user.email || user.emailAddress || '',
-        name: user.name || user.fullname || user.fullName || '',
-        phoneNumber: user.phoneNumber || user.phone || '',
-        avatar: user.avatar || '',
+        uid: user.uid || user.id || existing.uid || '',
+        email: user.email || user.emailAddress || existing.email || '',
+        name: user.name || user.fullname || user.fullName || existing.name || '',
+        phoneNumber: user.phoneNumber || user.phone || existing.phoneNumber || '',
+        avatar: user.avatar || existing.avatar || '',
+        icNumber: user.icNumber || existing.icNumber,
+        emergencyContact: user.emergencyContact || existing.emergencyContact,
       };
       localStorage.setItem('tm_user', JSON.stringify(normalized));
       try {
@@ -131,11 +137,11 @@ const apiClient = {
   auth: {
     signup: async (data) => {
       const body = {
-        fullname: data.fullname || data.fullName || '',
-        icNumber: data.icNumber || '',
-        phoneNumber: data.phoneNumber || '',
-        email: data.email,
-        password: data.password,
+        fullname: (data.fullname || data.fullName || '').trim(),
+        icNumber: (data.icNumber || '').trim(),
+        phoneNumber: (data.phoneNumber || '').trim(),
+        email: (data.email || '').trim().toLowerCase(),
+        password: (data.password || '').trim(),
       };
       const res = await fetch(N8N_ENDPOINTS.signup, {
         method: 'POST',
@@ -151,10 +157,14 @@ const apiClient = {
       return { ok: res.ok, token, data: json };
     },
     login: async (email, password) => {
+      const payload = {
+        email: (email || '').trim().toLowerCase(),
+        password: (password || '').trim(),
+      };
       const res = await fetch(N8N_ENDPOINTS.login, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify(payload),
       });
       const json = await res.json().catch(() => ({}));
       const token = json.token || json.accessToken || (json.data && json.data.token) || '';
@@ -169,6 +179,8 @@ const apiClient = {
       try {
         if (typeof window !== 'undefined') {
           localStorage.removeItem('tm_user');
+          localStorage.removeItem('userProfile');
+          localStorage.removeItem('careRecipients');
         }
       } catch {}
       try {
@@ -179,6 +191,28 @@ const apiClient = {
     getToken: () => getToken(),
     isLoggedIn: () => !!getToken(),
     getUser: () => getUser(),
+    forgotPassword: async (email) => {
+      const res = await fetch(N8N_ENDPOINTS.forgotPassword, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+      const json = await res.json().catch(() => ({}));
+      return { ok: res.ok, data: json };
+    },
+    changePassword: async ({ currentPassword, newPassword }) => {
+      const token = getToken();
+      const res = await fetch(N8N_ENDPOINTS.changePassword, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({ currentPassword, newPassword }),
+      });
+      const json = await res.json().catch(() => ({}));
+      return { ok: res.ok, data: json };
+    },
     me: async () => {
       const token = getToken();
       if (!token) return { ok: false, data: null };
@@ -201,15 +235,21 @@ const apiClient = {
           }
         } catch {}
         const profile = {
-          fullName: userPayload?.fullname || userPayload?.name || '',
-          icNumber: userPayload?.icNumber || '',
-          phoneNumber: userPayload?.phoneNumber || userPayload?.phone || '',
-          emailAddress: userPayload?.email || userPayload?.emailAddress || '',
-          emergencyContact: userPayload?.emergencyContact || '',
+          fullName: userPayload?.fullname || userPayload?.name,
+          icNumber: userPayload?.icNumber,
+          phoneNumber: userPayload?.phoneNumber || userPayload?.phone,
+          emailAddress: userPayload?.email || userPayload?.emailAddress,
+          emergencyContact: userPayload?.emergencyContact,
         };
         try {
           const existing = localStorage.getItem('userProfile');
-          const merged = { ...(existing ? JSON.parse(existing) : {}), ...profile };
+          const base = existing ? JSON.parse(existing) : {};
+          const merged = { ...base };
+          Object.entries(profile).forEach(([k, v]) => {
+            if (v !== undefined && v !== null && String(v).trim() !== '') {
+              merged[k] = v;
+            }
+          });
           localStorage.setItem('userProfile', JSON.stringify(merged));
           window.dispatchEvent(new Event('tm:auth'));
         } catch {}

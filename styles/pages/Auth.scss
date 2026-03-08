@@ -1,0 +1,29 @@
+.auth-page {
+  padding: $spacing-2xl 0;
+}
+
+.auth-page__container {
+  max-width: 560px;
+  margin: $spacing-xl auto 0;
+}
+
+.auth-page__title {
+  margin-bottom: $spacing-md;
+}
+
+.auth-page__subtitle {
+  margin-bottom: $spacing-lg;
+  color: $text-secondary;
+}
+
+.auth-page .user-profile__form-group {
+  margin-bottom: $spacing-md;
+}
+
+.auth-page .user-profile__alert {
+  margin: $spacing-md 0;
+}
+
+.auth-page .user-profile__btn {
+  margin-top: $spacing-md;
+}

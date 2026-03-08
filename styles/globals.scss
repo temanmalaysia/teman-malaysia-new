@@ -70,6 +70,7 @@
 @import "./pages/Terms.scss";
 @import "./pages/Privacy.scss";
 @import "./pages/user.scss";
+@import "./pages/Auth.scss";
 
 // Google Fonts
 // Google Fonts
@@ -147,6 +148,24 @@ img {
   max-width: 100%;
   height: auto;
   display: block;
+}
+
+// Ensure root takes full height for sticky footer layout
+html, body, #__next {
+  height: 100%;
+}
+
+// App shell layout: sticky footer
+.app-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-main {
+  flex: 1 0 auto;
+  // Offset for fixed header height
+  padding-top: 80px;
 }
 
 ul,
