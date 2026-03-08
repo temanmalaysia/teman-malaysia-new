@@ -18,6 +18,7 @@ import CareRecipientSelector from './CareRecipientSelector';
 import { FaCar, FaHeartbeat, FaUser, FaCalendarAlt, FaBookMedical, FaPlusSquare, FaStar, FaHome, FaExclamationTriangle, FaArrowLeft, FaArrowRight } from 'react-icons/fa';
 import {FaListCheck, FaLocationDot, FaUserGroup} from 'react-icons/fa6';
 import dayjs from 'dayjs';
+import { useEffect, useState } from 'react';
 
 export default function BookingDetails({
   theme = 'health',
@@ -31,6 +32,90 @@ export default function BookingDetails({
   selectedPackage = '',
   selectedHours = '',
 }) {
+  const ADDRESS_FIELDS = new Set([
+    'home_address',
+    'area_postcode',
+    'area_city',
+    'home_access_info',
+    'pickup_address',
+  ]);
+
+  const [useRecipientAddress, setUseRecipientAddress] = useState(false);
+  const [savedRecipients, setSavedRecipients] = useState([]);
+  const [addrRecipientIndex, setAddrRecipientIndex] = useState('');
+
+  useEffect(() => {
+    const load = () => {
+      try {
+        const raw = localStorage.getItem('careRecipients');
+        setSavedRecipients(raw ? JSON.parse(raw) : []);
+      } catch {
+        setSavedRecipients([]);
+      }
+    };
+    load();
+    const onAuth = () => load();
+    const onStorage = (e) => {
+      if (!e || !e.key || e.key === 'careRecipients') load();
+    };
+    window.addEventListener('tm:auth', onAuth);
+    window.addEventListener('storage', onStorage);
+    return () => {
+      window.removeEventListener('tm:auth', onAuth);
+      window.removeEventListener('storage', onStorage);
+    };
+  }, []);
+
+  const getActiveRecipient = () => {
+    if (savedRecipients.length === 0) return null;
+    if (addrRecipientIndex !== '') {
+      const i = parseInt(addrRecipientIndex);
+      return savedRecipients[i] || null;
+    }
+    // Prefer the selected index from CareRecipientSelector if available
+    if (formData._patient_use_saved && formData._patient_saved_index !== undefined && formData._patient_saved_index !== '') {
+      const i = parseInt(formData._patient_saved_index);
+      if (!Number.isNaN(i) && savedRecipients[i]) return savedRecipients[i];
+    }
+    const name = (formData.patient_name || '').trim().toLowerCase();
+    if (name) {
+      const idx = savedRecipients.findIndex(
+        (r) => (r.name || '').trim().toLowerCase() === name
+      );
+      if (idx >= 0) return savedRecipients[idx];
+    }
+    return savedRecipients[0];
+  };
+
+  const applyRecipientAddress = () => {
+    const r = getActiveRecipient();
+    if (!r) return;
+    const postcode = r.posscode || r.postcode || '';
+    const city = r.city || '';
+    const combined = [r.address || '', postcode || '', city || '']
+      .filter(Boolean)
+      .join(', ');
+    onFormChange({
+      ...formData,
+      home_address: combined,
+      area_postcode: postcode || formData.area_postcode,
+      area_city: city || formData.area_city,
+      home_access_info: r.accessInformation || formData.home_access_info,
+      pickup_address: combined,
+    });
+  };
+
+  const handleToggleUseRecipientAddress = (checked) => {
+    setUseRecipientAddress(checked);
+    if (checked) applyRecipientAddress();
+  };
+
+  // Keep local selection in sync with CareRecipientSelector's selected index
+  useEffect(() => {
+    if (formData && formData._patient_use_saved && formData._patient_saved_index !== undefined && formData._patient_saved_index !== '') {
+      setAddrRecipientIndex(String(formData._patient_saved_index));
+    }
+  }, [formData?._patient_use_saved, formData?._patient_saved_index]);
   // Autofill contact info from account/profile once on mount
   if (typeof window !== 'undefined' && !formData.__autofilled) {
     try {
@@ -614,6 +699,48 @@ export default function BookingDetails({
           ) : (
             /* Normal Fields Grid */
             <div className={`booking-details__grid ${section.gridCols === 1 ? 'booking-details__grid--single' : ''}`}>
+              {section.fields?.some((f) => ADDRESS_FIELDS.has(f.name)) && formData?._patient_use_saved && (
+                <div className="booking-details__field booking-details__field--full" style={{ marginBottom: '0.5rem' }}>
+                  {savedRecipients.length > 0 ? (
+                    <>
+                      <label className="booking-details__label">Address Options</label>
+                      <div className="booking-details__checkbox-group">
+                        <label className="booking-details__checkbox-option">
+                          <input
+                            type="checkbox"
+                            checked={useRecipientAddress}
+                            onChange={(e) => handleToggleUseRecipientAddress(e.target.checked)}
+                          />
+                          <span className="booking-details__checkbox-custom"></span>
+                          <span>Use saved care recipient address</span>
+                        </label>
+                        {useRecipientAddress && savedRecipients.length > 1 && (
+                          <select
+                            className="booking-details__select"
+                            value={addrRecipientIndex}
+                            onChange={(e) => {
+                              setAddrRecipientIndex(e.target.value);
+                              // Re-apply on change
+                              setTimeout(() => applyRecipientAddress(), 0);
+                            }}
+                          >
+                            <option value="">Auto (match recipient name)</option>
+                            {savedRecipients.map((r, i) => (
+                              <option key={i} value={i}>
+                                {r.name || `Recipient ${i + 1}`}
+                              </option>
+                            ))}
+                          </select>
+                        )}
+                      </div>
+                    </>
+                  ) : (
+                    <small className="booking-details__help">
+                      Tip: Save a care recipient in your Profile to quickly autofill address.
+                    </small>
+                  )}
+                </div>
+              )}
               {section.fields.map((field, fieldIndex) => (
                 <div
                   key={fieldIndex}

@@ -94,6 +94,8 @@ export default function CareRecipientSelector({
       patient_height: '',
       medical_conditions: '',
       special_requirements: '',
+      _patient_use_saved: false,
+      _patient_saved_index: '',
     });
   };
 
@@ -114,6 +116,8 @@ export default function CareRecipientSelector({
         patient_height: '',
         medical_conditions: '',
         special_requirements: '',
+        _patient_use_saved: false,
+        _patient_saved_index: '',
       });
     } else {
       // Fill form with selected recipient data
@@ -128,6 +132,8 @@ export default function CareRecipientSelector({
         patient_height: recipient.height || '',
         medical_conditions: recipient.medicalConditions || '',
         special_requirements: recipient.specialRequirements || '',
+        _patient_use_saved: true,
+        _patient_saved_index: parseInt(index),
       });
     }
   };
