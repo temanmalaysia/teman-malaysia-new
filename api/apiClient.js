@@ -23,7 +23,7 @@ const N8N_ENDPOINTS = {
   me: '/api/user/me',
   forgotPassword: '/api/auth/forgot-password',
   changePassword: '/api/auth/change-password',
-  booking: 'https://n8n-0faudat1jwfn.ciluba.sumopod.my.id/webhook-test/booking',
+  booking: 'https://n8n-0faudat1jwfn.ciluba.sumopod.my.id/webhook/booking',
 };
 
 /**

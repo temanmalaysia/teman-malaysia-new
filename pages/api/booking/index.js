@@ -11,7 +11,7 @@ export default async function handler(req, res) {
     res.status(200).end();
     return;
   }
-  const url = 'https://n8n-0faudat1jwfn.ciluba.sumopod.my.id/webhook-test/booking';
+  const url = 'https://n8n-0faudat1jwfn.ciluba.sumopod.my.id/webhook/booking';
   try {
     const resp = await fetch(url, {
       method: 'POST',
