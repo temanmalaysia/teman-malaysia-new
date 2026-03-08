@@ -50,10 +50,11 @@ export default function Header({ isSignedIn = false, user = null, onLogout }) {
     return () => router.events.off("routeChangeStart", handleRouteChange);
   }, [router.events]);
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     closeDropdown();
     closeMenu();
-    if (onLogout) onLogout();
+    if (onLogout) await Promise.resolve(onLogout());
+    router.push("/");
   };
 
   const getInitials = (name) => {
