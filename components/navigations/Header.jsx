@@ -28,6 +28,20 @@ export default function Header({ isSignedIn = false, user = null, onLogout }) {
   const toggleDropdown = () => setIsDropdownOpen((v) => !v);
   const closeDropdown = () => setIsDropdownOpen(false);
 
+  const handleSignInSuccess = () => {
+    try {
+      const dest = typeof window !== "undefined" ? localStorage.getItem("tm_post_login_redirect") : null;
+      if (dest) {
+        localStorage.removeItem("tm_post_login_redirect");
+        setIsSignInOpen(false);
+        router.push(dest);
+        return;
+      }
+    } catch {}
+    setIsSignInOpen(false);
+    router.push("/");
+  };
+
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -164,7 +178,18 @@ export default function Header({ isSignedIn = false, user = null, onLogout }) {
               <Link
                 href={link.href}
                 className={`nav__link ${isActive(link.href) ? "active" : ""}`}
-                onClick={closeMenu}
+                onClick={(e) => {
+                  if (link.href === "/booking" && !isSignedIn) {
+                    e.preventDefault();
+                    closeMenu();
+                    try {
+                      localStorage.setItem("tm_post_login_redirect", "/booking");
+                    } catch {}
+                    setIsSignInOpen(true);
+                    return;
+                  }
+                  closeMenu();
+                }}
               >
                 {link.label}
               </Link>
@@ -204,6 +229,7 @@ export default function Header({ isSignedIn = false, user = null, onLogout }) {
         <SignInModal
           isOpen={isSignInOpen}
           onClose={() => setIsSignInOpen(false)}
+          onSuccess={handleSignInSuccess}
         />
       </nav>
     </header>
