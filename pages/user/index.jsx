@@ -115,6 +115,7 @@ function User() {
   });
 
   const [message, setMessage] = useState({ type: "", text: "" });
+  const [expandedRecipients, setExpandedRecipients] = useState([]);
 
   // Refresh from account on auth changes
   useEffect(() => {
@@ -205,6 +206,31 @@ function User() {
     window.addEventListener("tm:auth", onAuth);
     return () => window.removeEventListener("tm:auth", onAuth);
   }, []);
+
+  // Keep accordion expansion in sync with recipients list (defer to avoid sync setState in effect)
+  useEffect(() => {
+    const update = () => {
+      try {
+        setExpandedRecipients((prev) =>
+          recipients.map((r, idx) => {
+            if (typeof prev[idx] !== "undefined") return prev[idx];
+            const hasName = r?.name && String(r.name).trim() !== "";
+            return !hasName; // open if no name yet
+          }),
+        );
+      } catch {
+        setExpandedRecipients(recipients.map(() => false));
+      }
+    };
+    const t = setTimeout(update, 0);
+    return () => clearTimeout(t);
+  }, [recipients]);
+
+  const toggleRecipientOpen = (i) => {
+    setExpandedRecipients((prev) =>
+      prev.map((v, idx) => (idx === i ? !v : v)),
+    );
+  };
 
   // Check if profile is complete (all required fields filled)
   const isProfileComplete = useMemo(() => {
@@ -330,7 +356,41 @@ function User() {
   const removeRecipient = (index) => {
     const confirmRemove = window.confirm("Remove this care recipient?");
     if (!confirmRemove) return;
-    setRecipients((prev) => prev.filter((_, i) => i !== index));
+    const next = recipients.filter((_, i) => i !== index);
+    setRecipients(next);
+    try {
+      localStorage.setItem("careRecipients", JSON.stringify(next));
+      setSavedRecipients(next);
+    } catch {}
+    const token = apiClient.auth.getToken ? apiClient.auth.getToken() : "";
+    if (token) {
+      apiClient.auth
+        .updateProfile({
+          profile: savedProfile,
+          recipients: next,
+        })
+        .then(async (res) => {
+          if (!res.ok) {
+            setMessage({
+              type: "error",
+              text: "Removed locally but failed to sync with server.",
+            });
+            return;
+          }
+          try {
+            await apiClient.auth.me();
+          } catch {}
+          setMessage({ type: "success", text: "Care recipient removed." });
+        })
+        .catch(() => {
+          setMessage({
+            type: "error",
+            text: "Removed locally but failed to sync with server.",
+          });
+        });
+    } else {
+      setMessage({ type: "success", text: "Care recipient removed locally." });
+    }
   };
 
   const saveRecipients = (e) => {
@@ -618,9 +678,16 @@ function User() {
                           data-testid={`recipient-${index}`}
                         >
                           <div className="user-profile__recipient-header">
-                            <span className="user-profile__recipient-number">
-                              {r.name && String(r.name).trim() ? String(r.name).trim() : `Recipient ${index + 1}`}
-                            </span>
+                            <button
+                              type="button"
+                              className="user-profile__recipient-number"
+                              onClick={() => toggleRecipientOpen(index)}
+                              aria-expanded={!!expandedRecipients[index]}
+                            >
+                              {r.name && String(r.name).trim()
+                                ? String(r.name).trim()
+                                : `Recipient ${index + 1}`}
+                            </button>
                             <button
                               type="button"
                               className="user-profile__btn user-profile__btn--danger user-profile__btn--small"
@@ -631,7 +698,9 @@ function User() {
                               <span>Remove</span>
                             </button>
                           </div>
-
+                          
+                          {expandedRecipients[index] && (
+                          <>
                           <div className="user-profile__form-row">
                             <div className="user-profile__form-group">
                               <label className="user-profile__label">
@@ -857,6 +926,8 @@ function User() {
                               />
                             </div>
                           </div>
+                          </>
+                          )}
                         </div>
                       ))}
                     </div>

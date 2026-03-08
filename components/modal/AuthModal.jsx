@@ -369,9 +369,9 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'signin', onS
                   <span className="auth-modal__checkbox-custom"></span>
                   <span className="auth-modal__checkbox-label">Remember me</span>
                 </label>
-                {/* <Link href="/auth/forgot-password" className="auth-modal__forgot">
+                <Link href="/auth/reset-password" className="auth-modal__forgot">
                   Forgot password?
-                </Link> */}
+                </Link>
               </div>
             )}
 
