@@ -322,408 +322,85 @@ const apiClient = {
   },
   booking: {
     /**
-     * Submit booking to Google Sheets via Apps Script + Formspree for email
-     * @param {Object} formData - Form data from booking form
-     * @param {string} serviceType - 'health' | 'dialysis' | 'customActivities' | 'homePackage'
-     * @param {Object} options - Additional options
-     * @param {boolean} options.sendEmail - Whether to send email via Formspree (default: true)
-     * @param {boolean} options.redirectToPayment - Whether to redirect to payment (default: false)
-     * @param {number} options.redirectDelay - Delay before redirect in ms (default: 1500)
+     * Submit booking directly to n8n webhook
+     * @param {Object} formData
+     * @param {'health'|'dialysis'|'customActivities'|'homePackage'} serviceType
      * @returns {Promise<{ok: boolean, refNumber: string, serviceType: string}>}
      */
-    submit: async (formData, serviceType = 'health', options = {}) => {
-      const { 
-        sendEmail = true, 
-        redirectToPayment = false,
-        redirectDelay = 1500,
-      } = options;
-      
-      // Validate serviceType
+    submit: async (formData, serviceType = 'health') => {
       const validTypes = ['health', 'dialysis', 'customActivities', 'homePackage'];
       if (!validTypes.includes(serviceType)) {
-        console.warn(`Invalid serviceType "${serviceType}", defaulting to "health"`);
         serviceType = 'health';
       }
-      
       const refNumber = generateRefNumber();
-      
-      // Get service-specific URLs
-      const googleScriptUrl = GOOGLE_SCRIPT_URLS[serviceType];
-      const formspreeUrl = FORMSPREE_URLS[serviceType];
-      
-      /**
-       * Normalize field names to match Google Apps Script expected field names.
-       * Each service's Google Script expects specific field names that may
-       * differ from what the React form components use.
-       */
-      const normalizeFieldNames = (data, type) => {
-        const d = { ...data };
-        
-        // =============================================
-        // COMMON MAPPINGS (all services)
-        // =============================================
-        
-        // Map preferred_gender to companion_gender
-        if (d.preferred_gender) {
-          d.companion_gender = d.preferred_gender;
-        }
-        
-        // Map language fields to companion_language
-        const langValue = d.preferred_language || d.language_preference || d.patient_language || '';
-        if (langValue) {
-          d.companion_language = langValue;
-        }
-        
-        // Handle employer mapping
-        if (d.employer_name && !d.employer) {
-          d.employer = d.employer_name;
-        }
 
-        // =============================================
-        // DIALYSIS MAPPINGS
-        // =============================================
-        if (type === 'dialysis') {
-          const dateList = Array.isArray(d.treatment_dates)
-            ? d.treatment_dates.join(', ')
-            : (d.treatment_dates || '');
-          if (dateList) {
-            d.multi_dates = dateList;
-          }
-          
-          const startTime = d.treatment_start_time || '';
-          if (startTime) {
-            d.preferred_start_time = startTime;
-          }
-
-          if (d.typical_session_duration && !d.session_duration) {
-            d.session_duration = d.typical_session_duration;
-          }
-          if (d.facility_address && !d.center_address) {
-            d.center_address = d.facility_address;
-          }
-          if (d.restrictions && !d.dietary_restrictions) {
-            d.dietary_restrictions = d.restrictions;
-          }
-          if (d.regular_schedule && !d.treatment_schedule) {
-            d.treatment_schedule = d.regular_schedule;
-          }
-        }
-
-        // =============================================
-        // CUSTOM ACTIVITIES MAPPINGS
-        // =============================================
-        if (type === 'customActivities') {
-          const activityDates = Array.isArray(d.activity_dates)
-            ? d.activity_dates.join(', ')
-            : (d.activity_dates || '');
-          if (activityDates) {
-            d['Activity Dates'] = activityDates;
-            d.activity_dates = activityDates;
-          }
-
-          if (!d.planned_activities && d.activities_list) {
-            d.planned_activities = d.activities_list;
-          }
-          if (!d.activities_list && d.planned_activities) {
-            d.activities_list = d.planned_activities;
-          }
-
-          const activitiesValue = d.planned_activities || d.activities_list || '';
-          if (activitiesValue) {
-            d['Activities'] = activitiesValue;
-          }
-
-          // patient_* → participant_*
-          if (d.patient_name && !d.participant_name) d.participant_name = d.patient_name;
-          if (d.patient_age && !d.participant_age) d.participant_age = d.patient_age;
-          if (d.patient_gender && !d.participant_gender) d.participant_gender = d.patient_gender;
-          if (d.patient_language && !d.participant_language) d.participant_language = d.patient_language;
-          if (d.patient_weight && !d.participant_weight) d.participant_weight = d.patient_weight;
-          if (d.patient_height && !d.participant_height) d.participant_height = d.patient_height;
-
-          // Activity time
-          if (!d.activity_time) {
-            d.activity_time = d.start_time || d.activity_start_time || d.preferred_start_time || '';
-          }
-
-          // Meeting address
-          if (!d.meeting_address) {
-            d.meeting_address = d.pickup_address || d.meeting_point || '';
-          }
-
-          // activity_location → activity_locations
-          if (d.activity_location && !d.activity_locations) {
-            d.activity_locations = d.activity_location;
-          }
-
-          // Medical fields
-          if (d.restrictions && !d.dietary_restrictions) d.dietary_restrictions = d.restrictions;
-          if (d.medical_conditions && !d.health_conditions) d.health_conditions = d.medical_conditions;
-
-          // Duration
-          if (!d.duration && d.activity_duration) d.duration = d.activity_duration;
-
-          // previous_experience → previous_experiences
-          if (d.previous_experience && !d.previous_experiences) d.previous_experiences = d.previous_experience;
-          if (d.experience && !d.previous_experiences) d.previous_experiences = d.experience;
-
-          // Postcode
-          if (!d.postcode) {
-            d.postcode = d.area_postcode || d.postal_code || d.zip_code || d.post_code || '';
-          }
-
-          // City
-          if (!d.city) {
-            d.city = d.area_city || d.city_name || d.area || d.town || '';
-          }
-        }
-
-        // =============================================
-        // HOME PACKAGE MAPPINGS
-        // Google Script expects specific field names
-        // that differ from the form field names
-        // =============================================
-        if (type === 'homePackage') {
-          // ---- package_cost ----
-          // Script expects "package_cost", form sends "estimated_cost"
-          if (!d.package_cost) {
-            d.package_cost = d.estimated_cost || '';
-          }
-
-          // ---- multi_dates ----
-          // Script expects "multi_dates", form sends "care_dates" (array)
-          const careDates = Array.isArray(d.care_dates)
-            ? d.care_dates.join(', ')
-            : (d.care_dates || '');
-          if (careDates && !d.multi_dates) {
-            d.multi_dates = careDates;
-          }
-          // Also ensure care_dates is a string
-          if (careDates) {
-            d.care_dates = careDates;
-          }
-
-          // ---- preferred_start_time / preferred_end_time ----
-          // Script expects "preferred_start_time" / "preferred_end_time"
-          // Form sends "start_time" / "end_time" (or care_start_time / care_end_time)
-          if (!d.preferred_start_time) {
-            d.preferred_start_time =
-              d.care_start_time ||
-              d.schedule_start ||
-              d.start_time ||
-              '';
-          }
-          if (!d.preferred_end_time) {
-            d.preferred_end_time =
-              d.care_end_time ||
-              d.schedule_end ||
-              d.end_time ||
-              '';
-          }
-
-          // ---- start_date / end_date ----
-          // Script expects "start_date" / "end_date"
-          // Form sends "service_start_date" / "service_end_date"
-          if (!d.start_date) {
-            d.start_date = d.service_start_date || '';
-          }
-          if (!d.end_date) {
-            d.end_date = d.service_end_date || '';
-          }
-
-          // ---- mobility_level ----
-          // Script expects "mobility_level", form sends "mobility_assistance"
-          if (!d.mobility_level) {
-            d.mobility_level =
-              d.mobility_assistance ||
-              d.mobility_status ||
-              '';
-          }
-
-          // ---- postcode ----
-          // Script expects "postcode", form may send "area_postcode"
-          if (!d.postcode) {
-            d.postcode =
-              d.area_postcode ||
-              d.postal_code ||
-              '';
-          }
-
-          // ---- city ----
-          // Script expects "city", form may send "area_city"
-          if (!d.city) {
-            d.city =
-              d.area_city ||
-              d.city_name ||
-              '';
-          }
-
-          // ---- home_access ----
-          // Form sends "home_access_info", Script expects "home_access"
-          if (!d.home_access) {
-            d.home_access = d.home_access_info || d.access_instructions || '';
-          }
-
-          // ---- allergies ----
-          // Form sends "restrictions", Script expects "allergies"
-          if (!d.allergies) {
-            d.allergies = d.restrictions || d.dietary_restrictions || '';
-          }
-
-          // ---- daily_routine ----
-          // Form sends "current_routine", Script expects "daily_routine"
-          if (!d.daily_routine) {
-            d.daily_routine = d.current_routine || '';
-          }
-
-          // ---- care_services[] ----
-          // Script expects key "care_services[]" (reads via data['care_services[]'])
-          // Form sends "care_services" as array or comma-separated string
-          const careServicesRaw = d.care_services;
-          if (careServicesRaw) {
-            const careServicesStr = Array.isArray(careServicesRaw)
-              ? careServicesRaw.join(', ')
-              : careServicesRaw;
-            d['care_services[]'] = careServicesStr;
-            // Also keep care_services as string
-            d.care_services = careServicesStr;
-          }
-        }
-
-        return d;
-      };
-
-      const normalizedData = normalizeFieldNames(formData, serviceType);
-
-      // Prepare data with metadata
-      const enrichedData = {
+      const enriched = {
+        ...formData,
         booking_reference: refNumber,
         service_type: formatServiceType(serviceType),
-        ...normalizedData,
-        submitted_at: new Date().toLocaleString('en-MY', { timeZone: 'Asia/Kuala_Lumpur' }),
+        submitted_at: new Date().toISOString(),
       };
 
-      const params = toURLParams(enrichedData);
+      const pick = (src, key, alt = []) =>
+        src[key] || alt.map((k) => src[k]).find((v) => !!v) || '';
 
-      try {
-        // 1. Submit to Google Sheets via Apps Script
-        const sheetsResponse = await fetch(googleScriptUrl, {
-          method: 'POST',
-          body: params,
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-          },
-        });
+      const payload = {
+        serviceType: pick(enriched, 'service_type'),
+        packageType: pick(enriched, 'package'),
+        hours: pick(enriched, 'selected_hours', ['hours']),
+        estimatedCost: pick(enriched, 'estimated_cost', ['package_cost']),
+        fullname: pick(enriched, 'full_name'),
+        icNumber: pick(enriched, 'ic_number'),
+        phoneNumber: pick(enriched, 'phone'),
+        email: pick(enriched, 'email'),
+        employer: pick(enriched, 'employer'),
+        staffId: pick(enriched, 'staff_id'),
+        emergencyContact: pick(enriched, 'emergency_contact'),
+        patientName: pick(enriched, 'patient_name'),
+        patientAge: pick(enriched, 'patient_age'),
+        patientGender: pick(enriched, 'patient_gender'),
+        patientLanguage: pick(enriched, 'patient_language'),
+        patientWeight: pick(enriched, 'patient_weight'),
+        patientHeight: pick(enriched, 'patient_height'),
+        appointmentDates: pick(enriched, 'appointment_dates', ['multi_dates', 'care_dates', 'activity_dates']),
+        appointmentType: pick(enriched, 'appointment_type'),
+        doctorName: pick(enriched, 'doctor_name'),
+        appointmentTime: pick(enriched, 'appointment_time', ['preferred_start_time', 'activity_time']),
+        estimatedDuration: pick(enriched, 'appointment_duration', ['session_duration', 'duration']),
+        facilityAddress: pick(enriched, 'facility_address', ['center_address']),
+        pickupAddress: pick(enriched, 'pickup_address', ['meeting_address']),
+        returnAddress: pick(enriched, 'return_address'),
+        pickupTime: pick(enriched, 'pickup_time'),
+        transportationMode: pick(enriched, 'transportation_mode'),
+        transportationNotes: pick(enriched, 'transportation_notes'),
+        medicalConditions: pick(enriched, 'medical_conditions', ['health_conditions']),
+        medications: pick(enriched, 'medications'),
+        mobilityAssistance: pick(enriched, 'mobility_assistance', ['mobility_level']),
+        specialRequirements: pick(enriched, 'special_requirements'),
+        companionGender: pick(enriched, 'companion_gender'),
+        companionLanguage: pick(enriched, 'companion_language'),
+        additionalNotes: pick(enriched, 'additional_notes'),
+        howHeard: pick(enriched, 'how_heard'),
+        bookingRef: refNumber,
+        submittedAt: enriched.submitted_at,
+        serviceKey: serviceType,
+      };
 
-        const sheetsData = await sheetsResponse.json();
+      const compact = Object.fromEntries(
+        Object.entries(payload).filter(([, v]) => v !== undefined && v !== null && v !== '')
+      );
 
-        if (sheetsData.status !== 'success') {
-          throw new Error('Google Sheets submission failed: ' + (sheetsData.message || 'Unknown error'));
-        }
+      const res = await fetch(N8N_ENDPOINTS.booking, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(compact),
+      }).catch(() => null);
 
-        // 2. Send email notification via Formspree (optional)
-        let emailSent = false;
-        if (sendEmail) {
-          try {
-            const formDataObj = new FormData();
-            for (const [key, value] of Object.entries(enrichedData)) {
-              if (Array.isArray(value)) {
-                formDataObj.append(key, value.join(', '));
-              } else {
-                formDataObj.append(key, String(value ?? ''));
-              }
-            }
-
-            const emailResponse = await fetch(formspreeUrl, {
-              method: 'POST',
-              body: formDataObj,
-              headers: {
-                Accept: 'application/json',
-              },
-            });
-
-            emailSent = emailResponse.ok;
-            if (!emailSent) {
-              console.warn('Formspree email notification failed, but booking was saved.');
-            }
-          } catch (emailError) {
-            console.warn('Email notification error:', emailError);
-          }
-        }
-
-        // 3. Redirect to payment (optional)
-        if (redirectToPayment) {
-          setTimeout(() => {
-            window.location.href = PAYMENT_URL;
-          }, redirectDelay);
-        }
-
-        try {
-          const pick = (src, key, alt = []) => src[key] || alt.map((k) => src[k]).find((v) => !!v) || '';
-          const payload = {};
-          payload.serviceType = pick(enrichedData, 'service_type');
-          payload.packageType = pick(enrichedData, 'package');
-          payload.hours = pick(enrichedData, 'selected_hours', ['hours']);
-          payload.estimatedCost = pick(enrichedData, 'estimated_cost', ['package_cost']);
-          payload.fullname = pick(enrichedData, 'full_name');
-          payload.icNumber = pick(enrichedData, 'ic_number');
-          payload.phoneNumber = pick(enrichedData, 'phone');
-          payload.email = pick(enrichedData, 'email');
-          payload.employer = pick(enrichedData, 'employer');
-          payload.staffId = pick(enrichedData, 'staff_id');
-          payload.emergencyContact = pick(enrichedData, 'emergency_contact');
-          payload.patientName = pick(enrichedData, 'patient_name');
-          payload.patientAge = pick(enrichedData, 'patient_age');
-          payload.patientGender = pick(enrichedData, 'patient_gender');
-          payload.patientLanguage = pick(enrichedData, 'patient_language');
-          payload.patientWeight = pick(enrichedData, 'patient_weight');
-          payload.patientHeight = pick(enrichedData, 'patient_height');
-          payload.appointmentDates = pick(enrichedData, 'appointment_dates', ['multi_dates', 'care_dates', 'activity_dates']);
-          payload.appointmentType = pick(enrichedData, 'appointment_type');
-          payload.doctorName = pick(enrichedData, 'doctor_name');
-          payload.appointmentTime = pick(enrichedData, 'appointment_time', ['preferred_start_time', 'activity_time']);
-          payload.estimatedDuration = pick(enrichedData, 'appointment_duration', ['session_duration', 'duration']);
-          payload.facilityAddress = pick(enrichedData, 'facility_address', ['center_address']);
-          payload.pickupAddress = pick(enrichedData, 'pickup_address', ['meeting_address']);
-          payload.returnAddress = pick(enrichedData, 'return_address');
-          payload.pickupTime = pick(enrichedData, 'pickup_time');
-          payload.transportationMode = pick(enrichedData, 'transportation_mode');
-          payload.transportationNotes = pick(enrichedData, 'transportation_notes');
-          payload.medicalConditions = pick(enrichedData, 'medical_conditions', ['health_conditions']);
-          payload.medications = pick(enrichedData, 'medications');
-          payload.mobilityAssistance = pick(enrichedData, 'mobility_assistance', ['mobility_level']);
-          payload.specialRequirements = pick(enrichedData, 'special_requirements');
-          payload.companionGender = pick(enrichedData, 'companion_gender');
-          payload.companionLanguage = pick(enrichedData, 'companion_language');
-          payload.additionalNotes = pick(enrichedData, 'additional_notes');
-          payload.howHeard = pick(enrichedData, 'how_heard');
-          const compact = Object.fromEntries(Object.entries(payload).filter(([, v]) => v !== undefined && v !== null && v !== ''));
-          await fetch(N8N_ENDPOINTS.booking, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(compact),
-          }).catch(() => {});
-        } catch {}
-
-        return { 
-          ok: true, 
-          refNumber, 
-          serviceType: formatServiceType(serviceType),
-          emailSent,
-        };
-
-      } catch (error) {
-        console.error('Booking submission error:', error);
-        
-        // Still redirect to payment even on error (matches original HTML behavior)
-        if (redirectToPayment) {
-          setTimeout(() => {
-            window.location.href = PAYMENT_URL;
-          }, 1000);
-        }
-        
-        throw error;
-      }
+      return {
+        ok: !!res && (res.ok || res.status === 200),
+        refNumber,
+        serviceType: formatServiceType(serviceType),
+      };
     },
 
     /**
