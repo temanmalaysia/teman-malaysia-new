@@ -2,6 +2,7 @@ import { useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { createPortal } from 'react-dom';
 import { FaCheckCircle, FaCreditCard } from 'react-icons/fa';
+import { useRouter } from 'next/router';
 
 // ===========================================
 // SUCCESS MODAL COMPONENT
@@ -14,7 +15,9 @@ export default function SuccessModal({
   paymentUrl = 'https://www.billplz.com/deposit4Teman',
   autoRedirect = true,
   redirectDelay = 2000,
+  redirectOnCloseToHome = false,
 }) {
+  const router = useRouter();
   // Handle ESC key to close modal
   const handleEscKey = useCallback((e) => {
     if (e.key === 'Escape') {
@@ -50,6 +53,16 @@ export default function SuccessModal({
   const handleBackdropClick = (e) => {
     if (e.target === e.currentTarget) {
       onClose();
+    }
+  };
+
+  const handleCloseClick = () => {
+    try {
+      onClose && onClose();
+    } finally {
+      if (redirectOnCloseToHome) {
+        router.push('/');
+      }
     }
   };
 
@@ -111,7 +124,7 @@ export default function SuccessModal({
           <button 
             type="button" 
             className="btn btn--outline" 
-            onClick={onClose}
+            onClick={handleCloseClick}
           >
             Close
           </button>

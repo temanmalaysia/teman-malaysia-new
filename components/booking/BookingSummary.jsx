@@ -846,6 +846,7 @@ export default function BookingSummary({
         paymentUrl="https://www.billplz.com/deposit4Teman"
         autoRedirect={true}
         redirectDelay={2000}
+        redirectOnCloseToHome={true}
       />
     </div>
   );
