@@ -341,6 +341,20 @@ const apiClient = {
         submitted_at: new Date().toISOString(),
       };
 
+      const slugForService = (keyOrLabel) => {
+        const k = (keyOrLabel || '').toString().toLowerCase();
+        if (k === 'health') return 'health-appointment';
+        if (k === 'dialysis') return 'dialysis';
+        if (k === 'customactivities') return 'custom-activities';
+        if (k === 'homepackage') return 'at-home';
+        if (k.includes('health')) return 'health-appointment';
+        if (k.includes('dialysis')) return 'dialysis';
+        if (k.includes('custom')) return 'custom-activities';
+        if (k.includes('home')) return 'at-home';
+        return '';
+      };
+      const slug = slugForService(serviceType);
+
       const pick = (src, key, alt = []) =>
         src[key] || alt.map((k) => src[k]).find((v) => !!v) || '';
 
@@ -349,8 +363,8 @@ const apiClient = {
         service_type: pick(enriched, 'service_type'),
         packageType: pick(enriched, 'package'),
         package: pick(enriched, 'package'),
-        hours: pick(enriched, 'selected_hours', ['hours']),
-        selected_hours: pick(enriched, 'selected_hours', ['hours']),
+        hours: pick(enriched, 'selected_hours', ['hours', 'appointment_duration', 'duration']),
+        selected_hours: pick(enriched, 'selected_hours', ['hours', 'appointment_duration', 'duration']),
         estimatedCost: pick(enriched, 'estimated_cost', ['package_cost']),
         estimated_cost: pick(enriched, 'estimated_cost', ['package_cost']),
         fullname: pick(enriched, 'full_name'),
@@ -407,10 +421,10 @@ const apiClient = {
         mobility_assistance: pick(enriched, 'mobility_assistance', ['mobility_level']),
         specialRequirements: pick(enriched, 'special_requirements'),
         special_requirements: pick(enriched, 'special_requirements'),
-        companionGender: pick(enriched, 'companion_gender'),
-        companion_gender: pick(enriched, 'companion_gender'),
-        companionLanguage: pick(enriched, 'companion_language'),
-        companion_language: pick(enriched, 'companion_language'),
+        companionGender: pick(enriched, 'companion_gender', ['preferred_gender']),
+        companion_gender: pick(enriched, 'companion_gender', ['preferred_gender']),
+        companionLanguage: pick(enriched, 'companion_language', ['language_preference', 'preferred_language']),
+        companion_language: pick(enriched, 'companion_language', ['language_preference', 'preferred_language']),
         additionalNotes: pick(enriched, 'additional_notes'),
         additional_notes: pick(enriched, 'additional_notes'),
         howHeard: pick(enriched, 'how_heard'),
@@ -426,7 +440,80 @@ const apiClient = {
         Object.entries(payload).filter(([, v]) => v !== undefined && v !== null && v !== '')
       );
 
-      const res = await fetch(N8N_ENDPOINTS.booking, {
+      // Service-specific field aliases to match Excel column names in n8n
+      if (slug === 'health-appointment') {
+        compact.hours = compact.hours || pick(enriched, 'appointment_duration', ['duration']);
+        compact.returnAddress = compact.returnAddress || pick(enriched, 'return_address') || compact.pickupAddress || '';
+        compact.return_address = compact.return_address || compact.returnAddress || '';
+        compact.companionGender = compact.companionGender || pick(enriched, 'preferred_gender');
+        compact.companionLanguage = compact.companionLanguage || pick(enriched, 'language_preference', ['preferred_language']);
+      } else if (slug === 'dialysis') {
+        // Companion add-on and hours
+        const addonLabel = pick(enriched, 'companion_addon', ['companionAddon']);
+        const addonHours =
+          pick(enriched, 'companion_hours', ['addon_hours', 'addonHours']) ||
+          ((addonLabel || '').match(/(\d+)\s*hour/i)?.[1] || '');
+        if (addonLabel) compact.companionAddon = addonLabel;
+        if (addonHours) compact.companionHours = addonHours;
+        // Dialysis-specific scheduling and addresses
+        compact.treatmentDates = compact.treatmentDates || pick(enriched, 'treatment_dates');
+        compact.startTime = compact.startTime || pick(enriched, 'treatment_start_time', ['start_time']);
+        compact.sessionDuration = compact.sessionDuration || pick(enriched, 'session_duration', ['typical_session_duration']);
+        compact.centerAddress = compact.centerAddress || pick(enriched, 'center_address', ['facility_address']);
+        compact.returnAddress = compact.returnAddress || pick(enriched, 'return_address') || compact.pickupAddress || '';
+        compact.return_address = compact.return_address || compact.returnAddress || '';
+        compact.treatmentSchedule = compact.treatmentSchedule || pick(enriched, 'treatment_schedule', ['regular_schedule']);
+        compact.dietaryRestrictions = compact.dietaryRestrictions || pick(enriched, 'dietary_restrictions', ['restrictions']);
+      } else if (slug === 'custom-activities') {
+        // Participant fields
+        compact.participantName = compact.participantName || pick(enriched, 'participant_name', ['patient_name']);
+        compact.participantAge = compact.participantAge || pick(enriched, 'participant_age', ['patient_age']);
+        compact.participantGender = compact.participantGender || pick(enriched, 'participant_gender', ['patient_gender']);
+        compact.participantLanguage = compact.participantLanguage || pick(enriched, 'participant_language', ['patient_language']);
+        compact.participantWeight = compact.participantWeight || pick(enriched, 'participant_weight', ['patient_weight']);
+        compact.participantHeight = compact.participantHeight || pick(enriched, 'participant_height', ['patient_height']);
+        // Activities and logistics
+        compact.activitiesList = compact.activitiesList || pick(enriched, 'planned_activities', ['activities_list']);
+        compact.activityPace = compact.activityPace || pick(enriched, 'activity_pace');
+        compact.activityDates = compact.activityDates || pick(enriched, 'activity_dates');
+        compact.activityTime = compact.activityTime || pick(enriched, 'activity_time');
+        compact.duration = compact.duration || pick(enriched, 'duration', ['activity_duration']);
+        compact.meetingAddress = compact.meetingAddress || pick(enriched, 'meeting_address', ['pickup_address', 'meeting_point']);
+        compact.activityLocations = compact.activityLocations || pick(enriched, 'activity_locations', ['activity_location']);
+        compact.postcode = compact.postcode || pick(enriched, 'postcode', ['area_postcode', 'postal_code']);
+        compact.city = compact.city || pick(enriched, 'city', ['area_city', 'city_name']);
+        // Health and restrictions
+        compact.healthConditions = compact.healthConditions || pick(enriched, 'health_conditions', ['medical_conditions']);
+        compact.dietaryRestrictions = compact.dietaryRestrictions || pick(enriched, 'dietary_restrictions', ['restrictions']);
+        compact.emergencyProcedures = compact.emergencyProcedures || pick(enriched, 'emergency_procedures');
+        // Companion prefs
+        compact.companionGender = compact.companionGender || pick(enriched, 'preferred_gender', ['companion_gender']);
+        compact.companionLanguage = compact.companionLanguage || pick(enriched, 'language_preference', ['preferred_language', 'companion_language']);
+        // Goals and experiences
+        compact.activityGoals = compact.activityGoals || pick(enriched, 'activity_goals', ['goals']);
+        compact.previousExperiences = compact.previousExperiences || pick(enriched, 'previous_experiences', ['previous_experience', 'experience']);
+      } else if (slug === 'at-home') {
+        // Home package aliases
+        compact.packageCost = compact.packageCost || pick(enriched, 'package_cost', ['estimated_cost']);
+        compact.homeAddress = compact.homeAddress || pick(enriched, 'home_address');
+        compact.postcode = compact.postcode || pick(enriched, 'postcode', ['area_postcode', 'postal_code']);
+        compact.city = compact.city || pick(enriched, 'city', ['area_city', 'city_name']);
+        compact.homeAccess = compact.homeAccess || pick(enriched, 'home_access', ['home_access_info', 'access_instructions']);
+        compact.multiDates = compact.multiDates || pick(enriched, 'multi_dates', ['care_dates']);
+        compact.preferredStartTime = compact.preferredStartTime || pick(enriched, 'preferred_start_time');
+        compact.preferredEndTime = compact.preferredEndTime || pick(enriched, 'preferred_end_time');
+        compact.startDate = compact.startDate || pick(enriched, 'start_date', ['service_start_date']);
+        compact.endDate = compact.endDate || pick(enriched, 'end_date', ['service_end_date']);
+        compact.careServices = compact.careServices || pick(enriched, 'care_services');
+        compact.allergies = compact.allergies || pick(enriched, 'allergies');
+        compact.mobilityLevel = compact.mobilityLevel || pick(enriched, 'mobility_level', ['mobility_assistance']);
+        compact.cognitiveStatus = compact.cognitiveStatus || pick(enriched, 'cognitive_status', ['cognitiveStatus']);
+        compact.dailyRoutine = compact.dailyRoutine || pick(enriched, 'daily_routine', ['current_routine']);
+        compact.familyInvolvement = compact.familyInvolvement || pick(enriched, 'family_involvement');
+      }
+
+      const endpoint = slug ? `${N8N_ENDPOINTS.booking}/${slug}` : N8N_ENDPOINTS.booking;
+      const res = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(compact),

@@ -452,12 +452,25 @@ export default function BookingSummary({
     setIsSubmitting(true);
 
     try {
+      const hoursForSubmission = (() => {
+        if (theme === "health") {
+          if (selectedPackage === "hourly") return selectedHours || "";
+          if (selectedPackage === "4hours") return "4";
+          if (selectedPackage === "6hours") return "6";
+        } else if (theme === "dialysis") {
+          if (selectedPackage === "hourly") return selectedHours || "";
+          // For multi-session package, hours may not apply; keep provided value if any
+          if (selectedPackage === "3sessions") return selectedHours || "";
+        }
+        return selectedHours || "";
+      })();
+
       const submissionData = {
         ...formData,
         service_type: config.serviceName,
         package: getPackageLabel(),
         estimated_cost: `RM ${calculateCost().toLocaleString()}`,
-        hours: selectedHours || '',
+        hours: hoursForSubmission,
       };
 
       // Normalize language/companion preferences
@@ -559,6 +572,8 @@ export default function BookingSummary({
       if (theme === "dialysis") {
         if (addonSelected) {
           submissionData.companion_addon = getAddonLabel();
+          submissionData.companionHours = addonHours || "";
+          submissionData.companion_hours = addonHours || "";
         }
 
         if (formData.treatment_dates) {
@@ -572,6 +587,12 @@ export default function BookingSummary({
         if (formData.treatment_start_time) {
           submissionData.treatment_start_time = formData.treatment_start_time;
         }
+
+        submissionData.treatment_schedule =
+          formData.regular_schedule ||
+          formData.treatment_schedule ||
+          submissionData.treatment_schedule ||
+          "";
       }
 
       // ====================================================

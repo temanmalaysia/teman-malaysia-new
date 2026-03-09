@@ -11,12 +11,42 @@ export default async function handler(req, res) {
     res.status(200).end();
     return;
   }
-  const url = 'https://n8n-0faudat1jwfn.ciluba.sumopod.my.id/webhook/booking';
+  const pickSlug = (body, query) => {
+    // Highest priority: explicit query ?service=<slug>
+    const q = (query?.service || '').toString().trim().toLowerCase();
+    if (q) return q;
+    // Next: internal serviceKey
+    const key = (body?.serviceKey || '').toString().trim().toLowerCase();
+    if (key === 'health') return 'health-appointment';
+    if (key === 'dialysis') return 'dialysis';
+    if (key === 'customactivities') return 'custom-activities';
+    if (key === 'homepackage') return 'at-home';
+    // Next: human label serviceType
+    const label = (body?.serviceType || '').toString().trim().toLowerCase();
+    if (label.includes('health')) return 'health-appointment';
+    if (label.includes('dialysis')) return 'dialysis';
+    if (label.includes('custom')) return 'custom-activities';
+    if (label.includes('home')) return 'at-home';
+    return ''; // fallback: base
+  };
+  const slug = pickSlug(req.body || {}, req.query || {});
+  const base = 'https://n8n-0faudat1jwfn.ciluba.sumopod.my.id/webhook/booking';
+  const url = slug ? `${base}/${slug}` : base;
   try {
+    // Ensure returnAddress fallback for health & dialysis if empty
+    const body = { ...(req.body || {}) };
+    if ((slug === 'health-appointment' || slug === 'dialysis')) {
+      const r = body.returnAddress || body.return_address;
+      const p = body.pickupAddress || body.pickup_address;
+      if ((!r || String(r).trim() === '') && p) {
+        body.returnAddress = p;
+        body.return_address = p;
+      }
+    }
     const resp = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(req.body || {}),
+      body: JSON.stringify(body),
     });
     const text = await resp.text();
     let data;
