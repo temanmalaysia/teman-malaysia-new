@@ -1,7 +1,8 @@
 import Link from 'next/link';
 import { useState } from 'react';
-import InfoModal from '@/components/modal/InfoModal';
+import { useRouter } from 'next/router';
 import { FaStethoscope, FaHeartbeat, FaUsers, FaHome, FaCheck, FaArrowRight } from 'react-icons/fa';
+import AuthModal from '@/components/modal/AuthModal';
 
 const icons = {
   stethoscope: <FaStethoscope size={24} />,
@@ -110,9 +111,24 @@ const ServiceIcon = ({ icon }) => {
 };
 
 export default function ServicesGrid() {
-  const [noticeOpen, setNoticeOpen] = useState(false);
-  const [noticeTheme, setNoticeTheme] = useState('health');
-  const message = "We’re working on fixing a technical issue with our website. In the meantime, for any booking inquiries, please contact us directly through WhatsApp. We appreciate your patience.";
+  const router = useRouter();
+  const [showAuth, setShowAuth] = useState(false);
+  const [pendingHref, setPendingHref] = useState(null);
+  const isLoggedIn = () =>
+    typeof window !== 'undefined' && localStorage.getItem('tm_signed_in') === '1';
+  const handleCardClick = (e, href) => {
+    if (!isLoggedIn()) {
+      e.preventDefault();
+      setPendingHref(href);
+      setShowAuth(true);
+    }
+  };
+  const handleAuthSuccess = () => {
+    const target = pendingHref;
+    setShowAuth(false);
+    setPendingHref(null);
+    if (target) router.push(target);
+  };
   return (
     <section className="services-grid-section">
       <div className="container">
@@ -122,8 +138,7 @@ export default function ServicesGrid() {
               key={service.id}
               href={service.href}
               className={`service-card service-card--${service.theme}`}
-              onClick={(e) => { e.preventDefault(); setNoticeOpen(true); setNoticeTheme(service.theme); }}
-              data-testid={`service-card-${service.id}`}
+              onClick={(e) => handleCardClick(e, service.href)}
             >
               <div className="service-card__header">
                 <div className="service-card__icon">
@@ -131,9 +146,7 @@ export default function ServicesGrid() {
                 </div>
                 <h3 className="service-card__title">{service.title}</h3>
               </div>
-
               <p className="service-card__description">{service.description}</p>
-
               <div className="service-card__features">
                 <ul>
                   {service.features.map((feature, index) => (
@@ -144,7 +157,6 @@ export default function ServicesGrid() {
                   ))}
                 </ul>
               </div>
-
               <div className="service-card__pricing">
                 <div className="service-card__pricing-title">Pricing Options:</div>
                 <div className="service-card__price">{service.pricing.price}</div>
@@ -152,7 +164,6 @@ export default function ServicesGrid() {
                   <div key={index} className="service-card__pricing-note">• {note}</div>
                 ))}
               </div>
-
               <div className="service-card__cta">
                 <span className="service-card__cta-text">{service.ctaText}</span>
                 <FaArrowRight size={20} />
@@ -161,12 +172,11 @@ export default function ServicesGrid() {
           ))}
         </div>
       </div>
-      <InfoModal
-        isOpen={noticeOpen}
-        onClose={() => setNoticeOpen(false)}
-        title="Booking Notice"
-        message={message}
-        theme={noticeTheme}
+      <AuthModal
+        isOpen={showAuth}
+        onClose={() => setShowAuth(false)}
+        initialMode="signin"
+        onSuccess={handleAuthSuccess}
       />
     </section>
   );

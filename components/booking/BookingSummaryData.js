@@ -283,6 +283,7 @@ export const bookingSummaryData = {
         { key: 'patient_language', label: 'Language:', default: 'English' },
         { key: 'health_notes', label: 'Health Notes:', default: 'None specified' },
         { key: 'mobility_assistance', label: 'Mobility Assistance:', default: 'None' },
+        { key: 'emergency_procedures', label: 'Emergency Procedures:', default: 'None specified' },
         ],
       },
       {
