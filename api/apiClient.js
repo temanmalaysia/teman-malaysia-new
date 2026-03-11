@@ -78,10 +78,16 @@ function setUser(user) {
     if (typeof window !== 'undefined' && user) {
       const existingRaw = localStorage.getItem('tm_user');
       const existing = existingRaw ? JSON.parse(existingRaw) : {};
+      let profName = '';
+      try {
+        const profRaw = localStorage.getItem('userProfile');
+        const prof = profRaw ? JSON.parse(profRaw) : null;
+        profName = prof && prof.fullName ? String(prof.fullName).trim() : '';
+      } catch {}
       const normalized = {
         uid: user.uid || user.id || existing.uid || '',
         email: user.email || user.emailAddress || existing.email || '',
-        name: user.name || user.fullname || user.fullName || existing.name || '',
+        name: profName || user.name || user.fullname || user.fullName || existing.name || '',
         phoneNumber: user.phoneNumber || user.phone || existing.phoneNumber || '',
         avatar: user.avatar || existing.avatar || '',
         icNumber: user.icNumber || existing.icNumber,
@@ -275,7 +281,9 @@ const apiClient = {
           const base = existing ? JSON.parse(existing) : {};
           const merged = { ...base };
           Object.entries(profile).forEach(([k, v]) => {
-            if (v !== undefined && v !== null && String(v).trim() !== '') {
+            if (v === undefined || v === null || String(v).trim() === '') return;
+            const current = merged[k];
+            if (!current || String(current).trim() === '') {
               merged[k] = v;
             }
           });
@@ -288,7 +296,10 @@ const apiClient = {
     updateProfile: async ({ profile, recipients = [] }) => {
       const token = getToken();
       const body = {
+        // send all common aliases so n8n workflow can persist to DB regardless of expected key
         fullname: profile.fullName || '',
+        name: profile.fullName || profile.name || '',
+        fullName: profile.fullName || '',
         icNumber: profile.icNumber || '',
         phoneNumber: profile.phoneNumber || '',
         email: profile.emailAddress || profile.email || '',

@@ -159,9 +159,7 @@ function User() {
           deriveNameFromEmail(acc?.email || prof?.emailAddress || "");
         setProfile((prev) => ({
           ...prev,
-          fullName: toTitleCase(
-            pick(prev.fullName, acc?.name, prof?.fullName, fallbackName),
-          ),
+          fullName: toTitleCase(pick(prev.fullName, prof?.fullName, acc?.name, fallbackName)),
           icNumber: pick(prev.icNumber, acc?.icNumber, prof?.icNumber),
           phoneNumber: pick(
             prev.phoneNumber,
@@ -177,9 +175,7 @@ function User() {
         }));
         setSavedProfile((prev) => ({
           ...prev,
-          fullName: toTitleCase(
-            pick(prev.fullName, acc?.name, prof?.fullName, fallbackName),
-          ),
+          fullName: toTitleCase(pick(prev.fullName, prof?.fullName, acc?.name, fallbackName)),
           icNumber: pick(prev.icNumber, acc?.icNumber, prof?.icNumber),
           phoneNumber: pick(
             prev.phoneNumber,
@@ -412,7 +408,8 @@ function User() {
       if (token) {
         apiClient.auth
           .updateProfile({
-            profile: savedProfile,
+            // use latest profile to persist recent edits like full name
+            profile: { ...savedProfile, fullName: profile.fullName || savedProfile.fullName },
             recipients,
           })
           .then(async (res) => {
