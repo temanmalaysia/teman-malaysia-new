@@ -2,7 +2,13 @@ import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/router";
-import { FaBars, FaUser, FaUserCircle, FaSignOutAlt, FaKey } from "react-icons/fa";
+import {
+  FaBars,
+  FaUser,
+  FaUserCircle,
+  FaSignOutAlt,
+  FaKey,
+} from "react-icons/fa";
 import SignInModal from "@/components/modal/AuthModal";
 
 export default function Header({ isSignedIn = false, user = null, onLogout }) {
@@ -30,7 +36,10 @@ export default function Header({ isSignedIn = false, user = null, onLogout }) {
 
   const handleSignInSuccess = () => {
     try {
-      const dest = typeof window !== "undefined" ? localStorage.getItem("tm_post_login_redirect") : null;
+      const dest =
+        typeof window !== "undefined"
+          ? localStorage.getItem("tm_post_login_redirect")
+          : null;
       if (dest) {
         localStorage.removeItem("tm_post_login_redirect");
         setIsSignInOpen(false);
@@ -178,16 +187,7 @@ export default function Header({ isSignedIn = false, user = null, onLogout }) {
               <Link
                 href={link.href}
                 className={`nav__link ${isActive(link.href) ? "active" : ""}`}
-                onClick={(e) => {
-                  if (link.href === "/booking" && !isSignedIn) {
-                    e.preventDefault();
-                    closeMenu();
-                    try {
-                      localStorage.setItem("tm_post_login_redirect", "/booking");
-                    } catch {}
-                    setIsSignInOpen(true);
-                    return;
-                  }
+                onClick={() => {
                   closeMenu();
                 }}
               >
