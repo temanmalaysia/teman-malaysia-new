@@ -1,8 +1,8 @@
-import { useEffect, useCallback } from 'react';
-import Link from 'next/link';
-import { createPortal } from 'react-dom';
-import { FaCheckCircle, FaCreditCard } from 'react-icons/fa';
-import { useRouter } from 'next/router';
+import { useEffect, useCallback } from "react";
+import Link from "next/link";
+import { createPortal } from "react-dom";
+import { FaCheckCircle, FaCreditCard } from "react-icons/fa";
+import { useRouter } from "next/router";
 
 // ===========================================
 // SUCCESS MODAL COMPONENT
@@ -11,25 +11,28 @@ export default function SuccessModal({
   isOpen,
   onClose,
   bookingRef,
-  theme = 'health',
-  paymentUrl = 'https://www.billplz.com/deposit4Teman',
+  theme = "health",
+  paymentUrl = "https://www.billplz.com/deposit4Teman",
   autoRedirect = true,
   redirectDelay = 2000,
   redirectOnCloseToHome = false,
 }) {
   const router = useRouter();
   // Handle ESC key to close modal
-  const handleEscKey = useCallback((e) => {
-    if (e.key === 'Escape') {
-      onClose();
-    }
-  }, [onClose]);
+  const handleEscKey = useCallback(
+    (e) => {
+      if (e.key === "Escape") {
+        onClose();
+      }
+    },
+    [onClose]
+  );
 
   // Auto-open payment page after delay
   useEffect(() => {
     if (isOpen && autoRedirect) {
       const timer = setTimeout(() => {
-        window.open(paymentUrl, '_blank');
+        window.open(paymentUrl, "_blank");
       }, redirectDelay);
 
       return () => clearTimeout(timer);
@@ -39,13 +42,13 @@ export default function SuccessModal({
   // Add/remove event listeners
   useEffect(() => {
     if (isOpen) {
-      document.addEventListener('keydown', handleEscKey);
-      document.body.style.overflow = 'hidden'; // Prevent background scroll
+      document.addEventListener("keydown", handleEscKey);
+      document.body.style.overflow = "hidden"; // Prevent background scroll
     }
 
     return () => {
-      document.removeEventListener('keydown', handleEscKey);
-      document.body.style.overflow = 'unset';
+      document.removeEventListener("keydown", handleEscKey);
+      document.body.style.overflow = "unset";
     };
   }, [isOpen, handleEscKey]);
 
@@ -61,7 +64,7 @@ export default function SuccessModal({
       onClose && onClose();
     } finally {
       if (redirectOnCloseToHome) {
-        router.push('/');
+        router.push("/");
       }
     }
   };
@@ -69,75 +72,70 @@ export default function SuccessModal({
   if (!isOpen) return null;
 
   const modalContent = (
-    <div 
+    <div
       className={`success-modal success-modal--${theme}`}
       role="dialog"
       aria-modal="true"
       aria-labelledby="success-modal-title"
     >
-      <div 
-        className="success-modal__backdrop" 
-        onClick={handleBackdropClick}
-      >
+      <div className="success-modal__backdrop" onClick={handleBackdropClick}>
         <div className="success-modal__content">
-        {/* Success Icon */}
-        <div className="success-modal__icon">
-          <FaCheckCircle size={64} />
-        </div>
-
-        {/* Title */}
-        <h2 id="success-modal-title" className="success-modal__title">
-          Thank You!
-        </h2>
-
-        {/* Message */}
-        <p className="success-modal__message">
-          We&apos;ve received your booking request and will contact you within 24 hours to
-          confirm the details.
-        </p>
-
-        {/* Payment Link */}
-        <p className="success-modal__message">
-          To complete your deposit payment, please proceed to our secure payment gateway:
-          <Link
-            href={paymentUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="success-modal__link"
-          >
-            {' '}Click here to make your payment
-          </Link>
-        </p>
-
-        {/* Booking Reference */}
-        {bookingRef && (
-          <div className="success-modal__reference">
-            <strong>Reference Number: {bookingRef}</strong>
+          {/* Success Icon */}
+          <div className="success-modal__icon">
+            <FaCheckCircle size={64} />
           </div>
-        )}
 
-        {/* Action Buttons */}
-        <div className="success-modal__actions">
-          <Link href="/booking" className="btn btn--primary">
-            Book Another Service
-          </Link>
-          <button 
-            type="button" 
-            className="btn btn--outline" 
-            onClick={handleCloseClick}
-          >
-            Close
-          </button>
+          {/* Title */}
+          <h2 id="success-modal-title" className="success-modal__title">
+            Thank You!
+          </h2>
+
+          {/* Message */}
+          <p className="success-modal__message">
+            We&apos;ve received your booking request and will contact you within
+            24 hours to confirm the details.
+          </p>
+
+          {/* Payment Link */}
+          <p className="success-modal__message">
+            To complete your deposit payment, please proceed to our secure
+            payment gateway:
+            <Link
+              href={paymentUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="success-modal__link"
+            >
+              {" "}
+              Click here to make your payment
+            </Link>
+          </p>
+          <p className="success-modal__message">
+            Please check your email for booking details and next steps.
+          </p>
+
+          {/* Action Buttons */}
+          <div className="success-modal__actions">
+            <Link href="/booking" className="btn btn--primary">
+              Book Another Service
+            </Link>
+            <button
+              type="button"
+              className="btn btn--outline"
+              onClick={handleCloseClick}
+            >
+              Close
+            </button>
+          </div>
         </div>
-      </div>
       </div>
     </div>
   );
 
   // Use portal to render modal at document root
-  if (typeof window !== 'undefined') {
+  if (typeof window !== "undefined") {
     return createPortal(modalContent, document.body);
   }
 
   return null;
-};
+}
